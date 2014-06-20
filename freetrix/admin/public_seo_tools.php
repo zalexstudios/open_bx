@@ -1,0 +1,1 @@
+<?require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/seo/admin/seo_tools.php");?>

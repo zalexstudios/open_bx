@@ -1,0 +1,1 @@
+<?require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/interface/filter_act.php");?>

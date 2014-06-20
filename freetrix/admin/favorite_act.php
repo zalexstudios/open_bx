@@ -1,0 +1,1 @@
+<?require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/interface/favorite_act.php");?>

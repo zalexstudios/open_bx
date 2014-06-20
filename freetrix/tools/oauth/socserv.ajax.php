@@ -1,0 +1,1 @@
+<?require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/socialservices/tools/socserv.ajax.php");?>

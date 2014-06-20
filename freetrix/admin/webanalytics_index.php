@@ -1,0 +1,1 @@
+<?require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/admin/webanalytics_index.php");?>
