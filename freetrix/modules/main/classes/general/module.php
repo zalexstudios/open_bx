@@ -1,15 +1,8 @@
 <?php
-/**
- * Freetrix Framework
- * @package freetrix
- * @subpackage main
- * @copyright 2001-2013 Freetrix
- */
 
 define("MODULE_NOT_FOUND", 0);
 define("MODULE_INSTALLED", 1);
-define("MODULE_DEMO", 2);
-define("MODULE_DEMO_EXPIRED", 3);
+
 
 class CModule
 {

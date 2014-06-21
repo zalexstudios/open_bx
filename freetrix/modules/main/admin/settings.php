@@ -32,6 +32,7 @@ $arModules = array(
 	)
 );
 $adminPage->Init();
+
 foreach($adminPage->aModules as $module)
 {
 	if($APPLICATION->GetGroupRight($module) < "R")
