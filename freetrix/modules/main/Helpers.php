@@ -3436,7 +3436,7 @@ function FormDecode()
 		unset($_POST[$gl]);
 		unset($_COOKIE[$gl]);
 	}
-
+	
 	$register_globals = ini_get_bool("register_globals");
 	if (!$register_globals)
 	{
@@ -6086,3 +6086,8 @@ function isSessionExpired()
 {
 	return isset($_SESSION["IS_EXPIRED"]) && $_SESSION["IS_EXPIRED"] === true;
 }
+
+function getmicrotime()
+{ 
+    return microtime();
+} 

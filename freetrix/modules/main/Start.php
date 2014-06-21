@@ -1,8 +1,13 @@
 <?php  
-
+/**
+* @package: Freetrix Core
+* Main file for launch base libs
+*
+**/
 error_reporting(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE); 
 require_once($_SERVER["DOCUMENT_ROOT"].'/freetrix/modules/main/SetCorePath.php'); 
 include_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/lib/loader.php"); 
+require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/Helpers.php"); 
 
 \Freetrix\Main\Loader::registerAutoLoadClasses( "main", 
 array( "freetrix\main\application" => "lib/application.php", 
@@ -37,8 +42,6 @@ array( "freetrix\main\application" => "lib/application.php",
  "freetrix\main\data\icacheengine" => "lib/data/cache.php", 
 "freetrix\main\data\hsphpreadconnection" => "lib/data/hsphpreadconnection.php", 
 "freetrix\main\data\managedcache" => "lib/data/managedcache.php",
-"freetrix\main\data\memcacheconnection" => "lib/data/memcacheconnection.php", 
-"freetrix\main\data\memcachedconnection" => "lib/data/memcachedconnection.php",
 "freetrix\main\data\nosqlconnection" => "lib/data/nosqlconnection.php",
 "freetrix\main\db\arrayresult" => "lib/db/arrayresult.php", 
 "freetrix\main\db\result" => "lib/db/result.php", 
@@ -53,12 +56,6 @@ array( "freetrix\main\application" => "lib/application.php",
 "freetrix\main\db\mysqliconnection" => "lib/db/mysqliconnection.php", 
 "freetrix\main\db\mysqliresult" => "lib/db/mysqliresult.php",
  "freetrix\main\db\mysqlisqlhelper" => "lib/db/mysqlisqlhelper.php", 
-"freetrix\main\db\mssqlconnection" => "lib/db/mssqlconnection.php",
- "freetrix\main\db\mssqlresult" => "lib/db/mssqlresult.php",
-"freetrix\main\db\mssqlsqlhelper" => "lib/db/mssqlsqlhelper.php",
- "freetrix\main\db\oracleconnection" => "lib/db/oracleconnection.php", 
-"freetrix\main\db\oracleresult" => "lib/db/oracleresult.php", 
-"freetrix\main\db\oraclesqlhelper" => "lib/db/oraclesqlhelper.php", 
 "freetrix\main\diag\httpexceptionhandleroutput" => "lib/diag/httpexceptionhandleroutput.php", 
 "freetrix\main\diag\fileexceptionhandlerlog" => "lib/diag/fileexceptionhandlerlog.php", 
 "freetrix\main\diag\exceptionhandler" => "lib/diag/exceptionhandler.php", 
@@ -85,30 +82,15 @@ array( "freetrix\main\application" => "lib/application.php",
 "freetrix\main\web\uri" => "lib/web/uri.php",
 'CTimeZone' => 'classes/general/time.php')); 
 
-$_1624779850= \Freetrix\Main\HttpApplication::getInstance(); 
+$application = \Freetrix\Main\HttpApplication::getInstance(); 
 
-$_1624779850->initializeBasicKernel(); 
-function getmicrotime(){ 
-    list($_169768817, $_585900161) = explode(" ", microtime()); 
-    return((float)$_169768817+ (float)$_585900161);
-} 
-define("START_EXEC_TIME", getmicrotime()); 
+$application->initializeBasicKernel(); 
+
 define("B_PROLOG_INCLUDED", true); 
 
-require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/Helpers.php"); 
-if(version_compare(PHP_VERSION, "5.0.0") >= 0  &&@ini_get_bool("register_long_arrays") != true)
-    { 
-        $HTTP_POST_FILES= $_FILES; 
-        $HTTP_SERVER_VARS= $_SERVER; 
-        $HTTP_GET_VARS= $_GET; 
-        $HTTP_POST_VARS= $_POST; 
-        $HTTP_COOKIE_VARS= $_COOKIE;
-         $HTTP_ENV_VARS= $_ENV;
-     } 
-     
-UnQuoteAll(); 
-FormDecode(); 
 
+/* Влияет на добавление типов инфоблока и просмотра инфоблоков */
+FormDecode(); 
 
 define("FX_UTF", true);
 define("FX_FILE_PERMISSIONS", 0644);
