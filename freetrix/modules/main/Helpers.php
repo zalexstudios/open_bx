@@ -3833,12 +3833,12 @@ function freetrix_sessid_set($val=false)
 
 function freetrix_sessid_val()
 {
-	return md5(CMain::GetServerUniqID().session_id());
+	return session_id();
 }
 
 function freetrix_sess_sign()
 {
-	return md5("nobody".CMain::GetServerUniqID()."nowhere");
+	return md5("nobody".session_id()."nowhere");
 }
 
 function check_freetrix_sessid($varname='sessid')

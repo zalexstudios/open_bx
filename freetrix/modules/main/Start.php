@@ -106,44 +106,40 @@ if(version_compare(PHP_VERSION, "5.0.0") >= 0  &&@ini_get_bool("register_long_ar
          $HTTP_ENV_VARS= $_ENV;
      } 
      
- UnQuoteAll(); 
- FormDecode(); 
- require_once($_SERVER["DOCUMENT_ROOT"].FX_PERSONAL_ROOT."/php_interface/dbconn.php"); 
- if(defined("FX_UTF")) 
-     define("FX_UTF_PCRE_MODIFIER", "u"); 
- else 
-     define("FX_UTF_PCRE_MODIFIER", ""); 
+UnQuoteAll(); 
+FormDecode(); 
+
+
+define("FX_UTF", true);
+define("FX_FILE_PERMISSIONS", 0644);
+define("FX_DIR_PERMISSIONS", 0755);
+@umask(~FX_DIR_PERMISSIONS);
+define("FX_DISABLE_INDEX_PAGE", true);
+define("FX_UTF_PCRE_MODIFIER", "u"); 
+define("CACHED_b_user_access_check", false ); 
+define("POST_FORM_ACTION_URI", htmlspecialcharsbx("/".ltrim($_SERVER["REQUEST_URI"], "/"))); 
+
+$connectionSettings = \Freetrix\Main\Config\Configuration::getValue('connections');
+$DBType = $connectionSettings['default']['dbType'];
+$DBHost = $connectionSettings['default']['host'];
+$DBLogin = $connectionSettings['default']['login'];
+$DBPassword = $connectionSettings['default']['password'];
+$DBName = $connectionSettings['default']['database'];
+$DBDebug = $connectionSettings['default']['debug'];
+$DBDebugToFile = $connectionSettings['default']['debugToFile'];
+$DBCharset = $connectionSettings['default']['charset'];
+     
  
+require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/".$DBType."/database.php"); 
+$GLOBALS["DB"]= new CDatabase; 
+$GLOBALS["DB"]->debug= $DBDebug; 
+$GLOBALS["DB"]->DebugToFile= $DBDebugToFile; 
+
  
- if(!defined("CACHED_b_user_access_check")) 
-     define("CACHED_b_user_access_check", false ); 
- 
- 
- require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/".$DBType."/database.php"); 
- $GLOBALS["DB"]= new CDatabase; 
- $GLOBALS["DB"]->debug= $DBDebug; 
- $GLOBALS["DB"]->DebugToFile= $DBDebugToFile; 
- $_1120501212= ""; if(array_key_exists("show_sql_stat", $_GET))
- {
-  $_1120501212=(strtoupper($_GET["show_sql_stat"]) == "Y"? "Y":""); 
-  setcookie("show_sql_stat", $_1120501212, false, "/");
- } 
- elseif(array_key_exists("show_sql_stat", $_COOKIE))
-     { 
-         $_1120501212= $_COOKIE["show_sql_stat"];
-     } 
- $GLOBALS["DB"]->ShowSqlStat = ($_1120501212 == "Y"); 
- 
- if(!defined("POST_FORM_ACTION_URI")) 
-     define("POST_FORM_ACTION_URI", htmlspecialcharsbx("/".ltrim($_SERVER["REQUEST_URI"], "/"))); 
- 
-if(!($GLOBALS["DB"]->Connect($DBHost, $DBName, $DBLogin, $DBPassword)))
+if(!($GLOBALS["DB"]->Connect($DBHost, $DBName, $DBLogin, $DBPassword,$DBCharset)))
 { 
-         if(file_exists(($_1269873926= $_SERVER["DOCUMENT_ROOT"].FX_PERSONAL_ROOT."/php_interface/dbconn_error.php"))) 
-             include($_1269873926); 
-         else 
-             include($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/include/dbconn_error.php"); 
-         die();
+    /* @todo: make universal method/function */
+    throw new \Exception("Cannont connect to database " . $DBName. '. Please check settings');
 } 
      
 require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/classes/general/punycode.php"); 
@@ -154,10 +150,3 @@ require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/ca
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/cache_html.php"); 
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/module.php"); 
 error_reporting(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE); 
-
-//Uncomment for update
-// if(file_exists(($_1269873926= $_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/update_db_updater.php")))
-// { 
-//     $US_HOST_PROCESS_MAIN= True; 
-//     include($_1269873926);
-// } 

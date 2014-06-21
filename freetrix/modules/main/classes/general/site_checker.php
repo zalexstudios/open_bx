@@ -2570,16 +2570,9 @@ function InitPureDB()
 
 	if(!($DB->Connect($DBHost, $DBName, $DBLogin, $DBPassword)) || !($DB->DoConnect()))
 	{
-		if(file_exists(($fname = $_SERVER["DOCUMENT_ROOT"]."/freetrix/php_interface/dbconn_error.php")))
-			include($fname);
-		else
-			include($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/include/dbconn_error.php");
-		die();
+		/* @todo: make universal method/function */
+		throw new \Exception('Cannont connect to database . Please check settings');
 	}
-	if (file_exists($fname = $_SERVER["DOCUMENT_ROOT"]."/freetrix/php_interface/after_connect.php"))
-		require_once($fname);
-	if (file_exists($fname = $_SERVER["DOCUMENT_ROOT"]."/freetrix/php_interface/after_connect_d7.php"))
-		require_once($fname);
 }
 
 function TableFieldConstruct($f0)
