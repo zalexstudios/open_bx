@@ -1,0 +1,13 @@
+Установка:
+Импортировать базу из файла freetrix_cms.sql
+Указать в настройках в файле freetrix/.setting.php ваш логин и пароль от базы.
+Доступы администратора:
+Логин: admin
+Пароль: qwerty2013
+
+Install:
+IMport data from file freetrix_cms.sql.
+Set your password and login of your database in file freetrix/.settings.php
+Access for administartor:
+login: admin
+password: qwerty2013
