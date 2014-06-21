@@ -4559,15 +4559,7 @@ abstract class CAllMain
 	public static function GetServerUniqID()
 	{
 		static $uniq = null;
-		if($uniq === null)
-		{
-			$uniq = COption::GetOptionString("main", "server_uniq_id", "");
-		}
-		if($uniq == '')
-		{
-			$uniq = md5(uniqid(rand(), true));
-			COption::SetOptionString("main", "server_uniq_id", $uniq);
-		}
+		$uniq = md5(uniqid(rand(), true));
 		return $uniq;
 	}
 

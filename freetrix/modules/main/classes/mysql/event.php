@@ -34,77 +34,11 @@ class CEvent extends CAllEvent
 			if(CMain::ForkActions(array("CEvent", "ExecuteEvents")))
 				return "";
 		}
-
-		$uniq = COption::GetOptionString("main", "server_uniq_id", "");
-		if(strlen($uniq)<=0)
-		{
-			$uniq = md5(uniqid(rand(), true));
-			COption::SetOptionString("main", "server_uniq_id", $uniq);
-		}
-
-		$bulk = intval(COption::GetOptionString("main", "mail_event_bulk", 5));
-		if($bulk <= 0)
-			$bulk = 5;
-
-		$strSql=
-			"SELECT 'x' ".
-			"FROM b_event ".
-			"WHERE SUCCESS_EXEC='N' ".
-			"LIMIT 1";
-
-		$db_result_event = $DB->Query($strSql);
-		if($db_result_event->Fetch())
-		{
-			$db_lock = $DB->Query("SELECT GET_LOCK('".$uniq."_event', 0) as L");
-			$ar_lock = $db_lock->Fetch();
-			if($ar_lock["L"]=="0")
-				return "";
-		}
-		else
-		{
-			if(CACHED_b_event!==false)
-				$CACHE_MANAGER->Set("events", true);
-
-			return "";
-		}
-
-		$strSql = "
-			SELECT ID, C_FIELDS, EVENT_NAME, MESSAGE_ID, LID, DATE_FORMAT(DATE_INSERT, '%d.%m.%Y %H:%i:%s') as DATE_INSERT, DUPLICATE
-			FROM b_event
-			WHERE SUCCESS_EXEC='N'
-			ORDER BY ID
-			LIMIT ".$bulk;
-
-		$rsMails = $DB->Query($strSql);
-
-		while($arMail = $rsMails->Fetch())
-		{
-			$flag = CEvent::HandleEvent($arMail);
-			/*
-			'0' - нет шаблонов (не нужно было ничего отправлять)
-			'Y' - все отправлены
-			'F' - все не смогли быть отправлены
-			'P' - частично отправлены
-			*/
-			$strSql = "
-				UPDATE b_event SET
-					DATE_EXEC = now(),
-					SUCCESS_EXEC = '$flag'
-				WHERE
-					ID = ".$arMail["ID"];
-			$DB->Query($strSql, false, $err_mess.__LINE__);
-		}
-
-		$DB->Query("SELECT RELEASE_LOCK('".$uniq."_event')");
 	}
 
 	function CleanUpAgent()
 	{
-		global $DB;
-		$period = abs(intval(COption::GetOptionString("main", "mail_event_period", 14)));
-		$strSql = "DELETE FROM b_event WHERE DATE_EXEC <= DATE_ADD(now(), INTERVAL -".$period." DAY)";
-		$DB->Query($strSql, true);
-		return "CEvent::CleanUpAgent();";
+		return true;
 	}
 }
 

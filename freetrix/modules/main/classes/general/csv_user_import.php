@@ -331,7 +331,7 @@ class CSVUserImport
 			$arFields["XML_ID"] = md5(uniqid(rand(), true));
 
 		if(!array_key_exists("CHECKWORD", $arFields) || strlen($arFields["CHECKWORD"]) <= 0)
-			$arFields["CHECKWORD"] = md5(CMain::GetServerUniqID().uniqid());
+			$arFields["CHECKWORD"] = md5(uniqid());
 
 		if ($this->imageFilePath !== null)
 		{

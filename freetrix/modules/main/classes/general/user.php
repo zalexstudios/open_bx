@@ -968,7 +968,7 @@ abstract class CAllUser extends CDBResult
 		// change CHECKWORD
 		$ID = intval($ID);
 		$salt = randString(8);
-		$checkword = md5(CMain::GetServerUniqID().uniqid());
+		$checkword = md5(uniqid());
 		$strSql = "UPDATE b_user SET ".
 			"	CHECKWORD = '".$salt.md5($salt.$checkword)."', ".
 			"	CHECKWORD_TIME = ".$DB->CurrentTimeFunction().", ".
@@ -1129,7 +1129,7 @@ abstract class CAllUser extends CDBResult
 			$USER_LOGIN = $USER_EMAIL;
 
 		global $REMOTE_ADDR;
-		$checkword = md5(CMain::GetServerUniqID().uniqid());
+		$checkword = md5(uniqid());
 		$bConfirmReq = COption::GetOptionString("main", "new_user_registration_email_confirmation", "N") == "Y";
 		$arFields = array(
 				"LOGIN" => $USER_LOGIN,
@@ -1244,7 +1244,7 @@ abstract class CAllUser extends CDBResult
 
 		global $REMOTE_ADDR;
 
-		$checkword = md5(CMain::GetServerUniqID().uniqid());
+		$checkword = md5(uniqid());
 		$arFields = array(
 			"CHECKWORD" => $checkword,
 			"~CHECKWORD_TIME" => $DB->CurrentTimeFunction(),
@@ -1826,7 +1826,7 @@ abstract class CAllUser extends CDBResult
 				if(is_set($arFields, "PASSWORD") || is_set($arFields, "EMAIL") || is_set($arFields, "LOGIN")  || is_set($arFields, "ACTIVE"))
 				{
 					$salt =  randString(8);
-					$checkword = md5(CMain::GetServerUniqID().uniqid());
+					$checkword = md5(uniqid());
 					$arFields["CHECKWORD"] = $salt.md5($salt.$checkword);
 				}
 			}

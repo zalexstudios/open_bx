@@ -530,7 +530,7 @@ class CSiteCheckerTest
 	function check_mail_b_event()
 	{
 		global $DB, $CACHE_MANAGER;
-
+		
 		$res = $DB->Query("SELECT COUNT(1) AS A FROM b_event WHERE SUCCESS_EXEC = 'N'");
 		$f = $res->Fetch();
 		if ($f['A'] > 0)

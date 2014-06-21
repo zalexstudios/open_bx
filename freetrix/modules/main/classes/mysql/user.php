@@ -41,7 +41,7 @@ class CUser extends CAllUser
 			unset($arFields["STORED_HASH"]);
 
 			$salt =  randString(8);
-			$checkword = ($arFields["CHECKWORD"] == ''? md5(CMain::GetServerUniqID().uniqid()) : $arFields["CHECKWORD"]);
+			$checkword = ($arFields["CHECKWORD"] == ''? md5(uniqid()) : $arFields["CHECKWORD"]);
 			$arFields["CHECKWORD"] = $salt.md5($salt.$checkword);
 
 			$arFields["~CHECKWORD_TIME"] = $DB->CurrentTimeFunction();
