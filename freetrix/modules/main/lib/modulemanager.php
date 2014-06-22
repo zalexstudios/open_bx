@@ -36,8 +36,6 @@ final class ModuleManager
 		self::$installedModules = array();
 		Loader::clearModuleCache($moduleName);
 
-		$cacheManager = Application::getInstance()->getManagedCache();
-		$cacheManager->clean("b_module");
 	}
 
 	public static function add($moduleName)
@@ -47,9 +45,6 @@ final class ModuleManager
 
 		self::$installedModules = array();
 		Loader::clearModuleCache($moduleName);
-
-		$cacheManager = Application::getInstance()->getManagedCache();
-		$cacheManager->clean("b_module");
 	}
 
 	public static function registerModule($moduleName)
@@ -62,9 +57,6 @@ final class ModuleManager
 
 	public static function unRegisterModule($moduleName)
 	{
-		$con = Application::getInstance()->getConnection();
-
-		$con->queryExecute("DELETE FROM b_agent WHERE MODULE_ID='".$con->getSqlHelper()->forSql($moduleName)."'");
 		\CMain::DelGroupRight($moduleName);
 
 		static::delete($moduleName);

@@ -1879,7 +1879,7 @@ class CFileMan
 
 	function ClearComponentsListCache($id = '')
 	{
-		$GLOBALS["CACHE_MANAGER"]->CleanDir("fileman_component_tree_array");
+		return true;
 	}
 
 	function SecurePathVar($str)
