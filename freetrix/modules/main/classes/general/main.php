@@ -2717,7 +2717,6 @@ abstract class CAllMain
 
 	function SetFileAccessPermission($path, $arPermissions, $bOverWrite=true)
 	{
-		global $CACHE_MANAGER;
 
 		CMain::InitPathVars($site, $path);
 		$DOC_ROOT = CSite::GetSiteDocRoot($site);
@@ -2801,7 +2800,6 @@ abstract class CAllMain
 		$str .= "?".">";
 
 		$this->SaveFileContent($DOC_ROOT.$path_dir."/.access.php", $str);
-		$CACHE_MANAGER->CleanDir("menu");
 		CFreetrixComponent::clearComponentCache("freetrix:menu");
 		unset($this->FILE_PERMISSION_CACHE[$site."|".$path_dir."/.access.php"]);
 

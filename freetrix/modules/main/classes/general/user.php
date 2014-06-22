@@ -1451,7 +1451,7 @@ abstract class CAllUser extends CDBResult
 				session_regenerate_id(true);
 
 			$APPLICATION->set_cookie("UIDH", "", 0, '/', false, false, COption::GetOptionString("main", "auth_multisite", "N")=="Y", false, true);
-			CHTMLPagesCache::OnUserLogout();
+
 		}
 
 		$arParams["SUCCESS"] = $bOk;

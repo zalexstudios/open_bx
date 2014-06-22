@@ -962,38 +962,7 @@ class CFreetrixComponent
 	 */
 	final public static function clearComponentCache($componentName, $siteId = "")
 	{
-		/** @global CCacheManager $CACHE_MANAGER */
-		global $CACHE_MANAGER;
-
-		$componentRelativePath = CComponentEngine::MakeComponentPath($componentName);
-		if ($componentRelativePath != "")
-		{
-			$obCache = new CPHPCache;
-			$obCache->CleanDir($componentRelativePath, "cache");
-			BXClearCache(true, $componentRelativePath);
-
-			if ($siteId == "")
-			{
-				$rsSite = \Freetrix\Main\SiteTable::getList(array('order' => array('SORT' => 'ASC')));
-				while ($site = $rsSite->fetch())
-				{
-					$componentCachePath = "/".$site["LID"].$componentRelativePath;
-					$obCache = new CPHPCache;
-					$obCache->CleanDir($componentCachePath, "cache");
-					BXClearCache(true, $componentCachePath);
-				}
-			}
-			else
-			{
-				$componentCachePath = "/".$siteId.$componentRelativePath;
-				$obCache = new CPHPCache;
-				$obCache->CleanDir($componentCachePath, "cache");
-				BXClearCache(true, $componentCachePath);
-			}
-
-			if(defined("FX_COMP_MANAGED_CACHE"))
-				$CACHE_MANAGER->ClearByTag($componentName);
-		}
+		return true;
 	}
 	/**
 	 * Function returns component cache path.

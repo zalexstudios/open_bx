@@ -1,4 +1,4 @@
-;(function(){
+(function(){
 
 if(window.BX.adminLogin)
 	return;
@@ -72,19 +72,6 @@ BX.adminLogin.prototype.Init = function()
 BX.adminLogin.prototype._checkHash = function()
 {
 	return;
-
-	if (BX.browser.IsOpera())
-		return;
-
-	var hash = window.location.hash.replace('#', '');
-	hash = hash.replace(/_message/g, '');
-
-	if (this.current_form && hash != this.current_form.name)
-	{
-		this.toggleAuthForm(hash);
-	}
-
-	this._listenerTimeout = setTimeout(BX.delegate(this._checkHash, this), 1000);
 }
 
 BX.adminLogin.prototype.toggleAuthForm = function(obForm)

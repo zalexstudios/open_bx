@@ -661,6 +661,7 @@ function GetDirList($path, &$arDirs, &$arFiles, $arFilter=array(), $sort=array()
 		{
 			if($child->IsDirectory())
 			{
+
 				$sSectionName = "";
 				$fsn = $io->CombinePath($abs_path, $file, ".section.php");
 				if(!$io->FileExists($fsn))
@@ -759,7 +760,7 @@ function GetDirList($path, &$arDirs, &$arFiles, $arFilter=array(), $sort=array()
 			$arFiles[]=$arFile;
 		}
 	}
-
+	
 	if(is_array($sort) && count($sort)>0)
 	{
 		$by = key($sort);

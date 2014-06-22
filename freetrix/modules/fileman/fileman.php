@@ -1,15 +1,8 @@
 <?
-/*
-##############################################
-# Freetrix: SiteManager                        #
-# Copyright (c) 2002-2005 Freetrix             #
-# http://www.freetrixsoft.com                  #
-# mailto:admin@freetrixsoft.com                #
-##############################################
-*/
+
 global $DOCUMENT_ROOT, $MESS;
 IncludeModuleLangFile(__FILE__);
-define("DEBUG_FILE_MAN", false);
+define("DEBUG_FILE_MAN", true);
 if(!defined("CACHED_stickers_count")) define("CACHED_stickers_count", 36000000);
 
 $GLOBALS['arFilemanPredifinedFileTypesR'] = array();
@@ -179,66 +172,7 @@ class CFileMan
 			));
 		}
 
-		//Sticker buttons
-		require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/fileman/classes/general/sticker.php");
-		if (CSticker::CanDoOperation('sticker_view'))
-		{
-			$useHotKeys = COption::GetOptionString('fileman', "stickers_use_hotkeys", "Y") == "Y";
-			$arMenu = array();
-			if (CSticker::CanDoOperation('sticker_new'))
-			{
-				$arMenu[] = array(
-					"TEXT" => '<div style="float: left; margin: 0 50px 0 0;">'.GetMessage("FMST_PANEL_STICKER_ADD").'</div>'.($useHotKeys ? '<div style="float: right;"><nobr>Ctrl+Shift+S</nobr></div>' : ''),
-					"TITLE" => GetMessage("FMST_PANEL_STICKER_ADD_TITLE"),
-					"ICON" => "",
-					"ACTION" => CSticker::GetScriptStr('add'),
-					"DEFAULT" => true,
-					"HK_ID"=>"FMST_PANEL_STICKER_ADD",
-				);
-				$arMenu[] = array("SEPARATOR" => true);
-			}
-
-			$curPageCount = CSticker::GetCurPageCount();
-			$arMenu[] = array(
-				"ID" => "bxst-show-sticker-icon",
-				"TEXT" => '<div style="float: left; margin: 0 50px 0 0;">'.GetMessage("FMST_PANEL_STICKERS_SHOW", array("#COUNT#" => $curPageCount)).'</div>'.($useHotKeys ? '<div style="float:right;"><nobr>Ctrl+Shift+X</nobr></div>' : ''),
-				"TITLE" => GetMessage("FMST_PANEL_STICKERS_SHOW_TITLE"),
-				"ICON" => CSticker::GetBShowStickers() ? " checked" : "",
-				"ACTION" => CSticker::GetScriptStr('show'),
-				"HK_ID"=>"FMST_PANEL_STICKERS_SHOW",
-			);
-			$arMenu[] = array(
-				//"TEXT" => GetMessage("FMST_PANEL_CUR_STICKER_LIST"),
-				"TEXT" => '<div style="float: left; margin: 0 50px 0 0;">'.GetMessage("FMST_PANEL_CUR_STICKER_LIST").'</div>'.($useHotKeys ? '<div style="float: right;"><nobr>Ctrl+Shift+L</nobr></div>' : ''),
-				"TITLE" => GetMessage("FMST_PANEL_CUR_STICKER_LIST_TITLE"),
-				"ICON" => "",
-				"ACTION" => CSticker::GetScriptStr('list_cur'),
-				"HK_ID"=>"FMST_PANEL_CUR_STICKER_LIST",
-			);
-			$arMenu[] = array(
-				"TEXT" => GetMessage("FMST_PANEL_ALL_STICKER_LIST"),
-				"TITLE" => GetMessage("FMST_PANEL_ALL_STICKER_LIST_TITLE"),
-				"ICON" => "",
-				"ACTION" => CSticker::GetScriptStr('list_all'),
-				"HK_ID"=>"FMST_PANEL_ALL_STICKER_LIST",
-			);
-
-			$APPLICATION->AddPanelButton(array(
-				"HREF" => 'javascript:'.(CSticker::CanDoOperation('sticker_edit') ? CSticker::GetScriptStr('add') : CSticker::GetScriptStr('show')),
-				"TYPE" => "SMALL",
-				"ICON" => "bx-panel-small-stickers-icon",
-				"TEXT" => GetMessage("FMST_PANEL_STICKERS_TOOLTIP_TITLE"),
-				"MAIN_SORT" => "1000",
-				"SORT" => 100,
-				"MENU" => $arMenu,
-				"HK_ID"=>"FMST_PANEL_STICKERS",
-				"HINT" => array(
-					"TITLE" => CSticker::CanDoOperation('sticker_edit') ? GetMessage("FMST_PANEL_STICKERS_TOOLTIP_TITLE") : GetMessage("FMST_PANEL_STICKERS_SHOW_1"),
-					"TEXT" => CSticker::CanDoOperation('sticker_edit') ? GetMessage("FMST_PANEL_STICKERS_TOOLTIP").($useHotKeys ? " (Ctrl+Shift+S)" : "") : GetMessage("FMST_PANEL_STICKERS_ALT").($useHotKeys ? " (Ctrl+Shift+X)" : "")
-				)
-			));
-			CSticker::Init(array('curPageCount' => $curPageCount));
-		}
+		
 	}
 
 	function CFileMan()

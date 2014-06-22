@@ -382,6 +382,7 @@ if (!$bSearch) // Display files and folders list
 					include($io->GetPhysicalName($absPath."/.section.php"));
 					if(strlen($sSectionName)<=0)
 						$sSectionName = GetMessage("FILEMAN_ADM_UNTITLED");
+
 					$dname = $sSectionName;
 				}
 			}
@@ -547,8 +548,10 @@ while($Elem = $db_DirContent->NavNext(true, "f_"))
 	$showFieldText = "";
 	if($Elem["TYPE"] == "D")
 	{
+		$f_NAME = !empty($Elem['LOGIC_NAME']) ? $Elem['LOGIC_NAME'] : $f_NAME;
 		$showFieldIcon = "<a href=\"fileman_admin.php?".$addUrl_s."&site=".urlencode($site)."&path=".$fpathUrl."&show_perms_for=".IntVal($show_perms_for)."\" onclick=\"".$sTableID.".GetAdminList('fileman_admin.php?".$addUrl_s."&site=".urlencode($site)."&path=".$fpathUrl."&show_perms_for=".IntVal($show_perms_for)."', GALCallBack);return false;\"><span class='adm-submenu-item-link-icon fileman_icon_folder'></span></a>";
 		$showFieldText = "<a href=\"fileman_admin.php?".$addUrl_s."&site=".urlencode($site)."&path=".$fpathUrl."&show_perms_for=".IntVal($show_perms_for)."\" onclick=\"".$sTableID.".GetAdminList('fileman_admin.php?".$addUrl_s."&site=".urlencode($site)."&path=".$fpathUrl."&show_perms_for=".IntVal($show_perms_for)."', GALCallBack);return false;\">".$f_NAME."</a>";
+	
 	}
 	else
 	{
