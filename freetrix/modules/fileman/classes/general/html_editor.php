@@ -395,24 +395,10 @@ class CHTMLEditor
 
 	public static function GetComponents($Params, $bClearCache = false)
 	{
-		global $CACHE_MANAGER;
+		
 
 		$allowed = trim(COption::GetOptionString('fileman', "~allowed_components", ''));
 		$mask = $allowed === '' ? 0 : substr(md5($allowed), 0, 10);
-
-		$lang = isset($Params['lang']) ? $Params['lang'] : LANGUAGE_ID;
-		$cache_name = 'component_tree_array_'.$lang.'_'.$mask;
-		$table_id = "fileman_component_tree";
-
-		if ($bClearCache)
-		{
-			$CACHE_MANAGER->CleanDir($table_id);
-		}
-
-		if($CACHE_MANAGER->Read(self::CACHE_TIME, $cache_name, $table_id))
-		{
-			self::$arComponents = $CACHE_MANAGER->Get($cache_name);
-		}
 
 		if (empty(self::$arComponents))
 		{
@@ -449,7 +435,6 @@ class CHTMLEditor
 				self::_HandleComponentElement($arTree['#'], '');
 			}
 
-			$CACHE_MANAGER->Set($cache_name, self::$arComponents);
 		}
 
 		return self::$arComponents;

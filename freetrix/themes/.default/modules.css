@@ -1,11 +1,3 @@
-.clouds-directory-icon
-{
-	background-position: center -118px;
-}
-.clouds-up-icon
-{
-	background-position: center -1574px;
-}
 /*Menu icon*/
 #fileman_menu_icon {background-image:url(icons/fileman/mnu_fileman.gif);}
 #fileman_page_icon {background-image:url(icons/fileman/title.gif);}
@@ -377,9 +369,6 @@ div.bx-fm-non-selectable {border:none !important; background: none!important; cu
 .bx-ml-pnbutton div.bx-pn2{background: url(/freetrix/images/fileman/medialib/browse.gif) -14px 0; width: 10px; height: 21px; float: left;}
 .bx-ml-pnbutton div.bx-pressed{background: url(/freetrix/images/fileman/medialib/browse.gif) -39px 0;}
 .bxml-empty-icon{height: 22px !important; width: 20px !important;}
-/*Menu icon*/
-#highloadblock_menu_icon {background-image:url(icons/highloadblock/mnu_hlblock_settings.gif);}
-#highloadblock_page_icon {background-image:url(icons/highloadblock/title_settings.gif);}
 img.linked
 {
 	position: relative;
@@ -399,4 +388,3 @@ img.linked
 {
 	background-position:  center -118px;
 }
-.perfmon_code {color:navy;}

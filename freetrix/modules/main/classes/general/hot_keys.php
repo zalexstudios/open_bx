@@ -160,33 +160,7 @@ class CHotKeysCode
 
 	protected function LoadToCache()
 	{
-		global $CACHE_MANAGER;
-
-		if(!is_array($this->arList))
-		{
-			if($CACHE_MANAGER->Read($this->hkCacheTtl, "b_hot_keys_code".LANGUAGE_ID))
-			{
-				$this->arList = $CACHE_MANAGER->Get("b_hot_keys_code".LANGUAGE_ID);
-			}
-			else
-			{
-				$res = $this->GetList();
-				while($arTemp = $res->Fetch())
-				{
-					if(!$arTemp["IS_CUSTOM"])
-					{
-						if(isset($arTemp["NAME"]) && $arTemp["NAME"] != "-=AUTONAME=-")
-							$arTemp["NAME"] = GetMessage($arTemp["NAME"]);
-
-						if(isset($arTemp["COMMENTS"]))
-							$arTemp["COMMENTS"] = GetMessage($arTemp["COMMENTS"]);
-					}
-
-					$this->arList[$arTemp["ID"]] = $arTemp;
-				}
-				$CACHE_MANAGER->Set("b_hot_keys_code".LANGUAGE_ID, $this->arList);
-			}
-		}
+		return true;
 	}
 
 	protected function CleanCache()

@@ -16,10 +16,7 @@ class CEvent extends CAllEvent
 		if((defined("DisableEventsCheck") && DisableEventsCheck===true) || (defined("FX_CRONTAB_SUPPORT") && FX_CRONTAB_SUPPORT===true && FX_CRONTAB!==true))
 			return;
 
-		global $DB, $CACHE_MANAGER;
-
-		if(CACHED_b_event !== false && $CACHE_MANAGER->Read(CACHED_b_event, "events"))
-			return "";
+		global $DB;
 
 		return CEvent::ExecuteEvents();
 	}

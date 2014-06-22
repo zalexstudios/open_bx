@@ -39,27 +39,6 @@ abstract class Application
 	protected $connectionPool;
 
 	/**
-	 * Managed cache instance.
-	 *
-	 * @var \Freetrix\Main\Data\ManagedCache
-	 */
-	protected $managedCache;
-
-	/**
-	 * Tagged cache instance.
-	 *
-	 * @var \Freetrix\Main\Data\TaggedCache
-	 */
-	protected $taggedCache;
-
-	/**
-	 * LRU cache instance.
-	 *
-	 * @var \Freetrix\Main\Data\LruCache
-	 */
-	protected $lruCache;
-
-	/**
 	 * @var \Freetrix\Main\Diag\ExceptionHandler
 	 */
 	protected $exceptionHandler = null;
@@ -103,7 +82,6 @@ abstract class Application
 		$this->isBasicKernelInitialized = true;
 
 		$this->initializeExceptionHandler();
-		$this->initializeCache();
 		$this->createDatabaseConnection();
 	}
 
@@ -259,28 +237,6 @@ abstract class Application
 		$this->connectionPool = new Data\ConnectionPool();
 	}
 
-	protected function initializeCache()
-	{
-		//TODO: Should be transfered to where GET parameter is defined in future
-		//magic parameters: show cache usage statistics
-		$show_cache_stat = "";
-		if (isset($_GET["show_cache_stat"]))
-		{
-			$show_cache_stat = (strtoupper($_GET["show_cache_stat"]) == "Y" ? "Y" : "");
-			@setcookie("show_cache_stat", $show_cache_stat, false, "/");
-		}
-		elseif (isset($_COOKIE["show_cache_stat"]))
-		{
-			$show_cache_stat = $_COOKIE["show_cache_stat"];
-		}
-		Data\Cache::setShowCacheStat($show_cache_stat === "Y");
-
-		if (isset($_GET["clear_cache_session"]))
-			Data\Cache::setClearCacheSession($_GET["clear_cache_session"] === 'Y');
-		if (isset($_GET["clear_cache"]))
-			Data\Cache::setClearCache($_GET["clear_cache"] === 'Y');
-	}
-
 	/*
 	final private function initializeDispatcher()
 	{
@@ -340,46 +296,6 @@ abstract class Application
 	{
 		$pool = Application::getInstance()->getConnectionPool();
 		return $pool->getConnection($name);
-	}
-
-	/**
-	 * Returns new instance of the Cache object.
-	 *
-	 * @return Data\Cache
-	 */
-	public function getCache()
-	{
-		return Data\Cache::createInstance();
-	}
-
-	/**
-	 * Returns manager of the managed cache.
-	 *
-	 * @return Data\ManagedCache
-	 */
-	public function getManagedCache()
-	{
-		if ($this->managedCache == null)
-		{
-			$this->managedCache = new Data\ManagedCache();
-		}
-
-		return $this->managedCache;
-	}
-
-	/**
-	 * Returns manager of the managed cache.
-	 *
-	 * @return Data\TaggedCache
-	 */
-	public function getTaggedCache()
-	{
-		if ($this->taggedCache == null)
-		{
-			$this->taggedCache = new Data\TaggedCache();
-		}
-
-		return $this->taggedCache;
 	}
 
 	/**

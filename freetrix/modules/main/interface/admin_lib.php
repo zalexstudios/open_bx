@@ -84,7 +84,6 @@ class CAdminPage
 
 	function GetModulesCSS($module_id='')
 	{
-		global $CACHE_MANAGER;
 		$rel_theme_path = ADMIN_THEMES_PATH."/".ADMIN_THEME_ID."/";
 		$abs_theme_path = $_SERVER["DOCUMENT_ROOT"].$rel_theme_path;
 
@@ -94,10 +93,7 @@ class CAdminPage
 				return array($rel_theme_path.$module_id.'.css');
 		}
 
-		if($CACHE_MANAGER->Read(36000000, ADMIN_THEME_ID, "modules_css"))
-			$time_cached = $CACHE_MANAGER->Get(ADMIN_THEME_ID);
-		else
-			$time_cached = '';
+		$time_cached = '';
 
 		//check modification time
 		$time_fact = '';
@@ -123,14 +119,6 @@ class CAdminPage
 
 			//create summary modules css
 			file_put_contents($css_file, $sCss);
-
-			if($time_cached !== '')
-			{
-				$CACHE_MANAGER->Clean(ADMIN_THEME_ID, "modules_css");
-				$CACHE_MANAGER->Read(36000000, ADMIN_THEME_ID, "modules_css");
-			}
-
-			$CACHE_MANAGER->Set(ADMIN_THEME_ID, $time_fact);
 		}
 
 		if(file_exists($css_file))

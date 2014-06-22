@@ -38,27 +38,12 @@ function handleComp2Tree()
 		$mask = 0;
 	}
 
-	// *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
-	global $CACHE_MANAGER;
 	$cache = Array();
 	$arTree = false;
-	$lang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : LANGUAGE_ID;
-	$cache_name = 'fileman_component_tree_array_'.$lang;
-	if (isset($_GET['clear_comp2_cache']) && $_GET['clear_comp2_cache'] == 'Y')
-		$CACHE_MANAGER->CleanDir("fileman_component_tree_array");
-
-	$ttl = 10*24*60*60; // Time of life
-	if($CACHE_MANAGER->Read($ttl, $cache_name, "fileman_component_tree_array"))
-	{
-		$cache = $CACHE_MANAGER->Get($cache_name);
-		if (isset($cache[$mask]))
-			$arTree = $cache[$mask];
-	}
 
 	if ($arTree === false)
 	{
 		$arTree = $cache[$mask] = CComponentUtil::GetComponentsTree($components_namespace, $arAllowedComponents);
-		$CACHE_MANAGER->Set($cache_name, $cache);
 	}
 	// *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
 

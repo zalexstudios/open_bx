@@ -1443,19 +1443,6 @@ window.MLSearchResult = [
 	{
 		global $DB;
 
-		if (self::$bCache)
-		{
-			$cache = new CPHPCache;
-			$cacheId = 'medialib_types_'.$bGetEmpties;
-			$cachePath = self::$cachePath.'types';
-
-			if ($cache->InitCache(self::$cacheTime, $cacheId, $cachePath))
-			{
-				$res = $cache->GetVars();
-				$arMLTypes = $res["arMLTypes"];
-			}
-		}
-
 		if (!self::$bCache || !isset($arMLTypes))
 		{
 			if ($bGetEmpties)
@@ -1497,13 +1484,7 @@ window.MLSearchResult = [
 				);
 			}
 
-			if (self::$bCache)
-			{
-				$cache->StartDataCache(self::$cacheTime, $cacheId, $cachePath);
-				$cache->EndDataCache(array(
-					"arMLTypes" => $arMLTypes
-				));
-			}
+
 		}
 
 		$result = array();

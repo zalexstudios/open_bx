@@ -1,17 +1,11 @@
 <?
-##############################################
-# Freetrix: SiteManager                        #
-# Copyright (c) 2002-2006 Freetrix             #
-# http://www.freetrixsoft.com                  #
-# mailto:admin@freetrixsoft.com                #
-##############################################
-
 //because Form's action don't changes without client's scripts, so just let's include the file for rights grouping change
 error_reporting(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE);
 
 // We prevent displaying WAF form and redirecting with JS errors
 define("FX_SECURITY_SHOW_MESSAGE", true);
 
+/* Загрузка файлов */
 if($_SERVER["REQUEST_METHOD"]=="POST" && strlen($_POST["perms"])>0 && is_array($_POST["files"]) && count($_POST["files"])>0)
 {
 	include($_SERVER["DOCUMENT_ROOT"]."/freetrix/admin/fileman_access.php");
@@ -380,11 +374,12 @@ if (!$bSearch) // Display files and folders list
 		if(strlen($path) > 0)
 		{
 			$dname = $path;
+
 			if($logical=="Y")
 			{
 				if($io->FileExists($absPath."/.section.php"))
 				{
-					@include($io->GetPhysicalName($absPath."/.section.php"));
+					include($io->GetPhysicalName($absPath."/.section.php"));
 					if(strlen($sSectionName)<=0)
 						$sSectionName = GetMessage("FILEMAN_ADM_UNTITLED");
 					$dname = $sSectionName;
@@ -1197,6 +1192,7 @@ $lAdmin->ShowChain($chain);
 $lAdmin->CheckListMode();
 
 /***********  MAIN PAGE **********/
+
 $APPLICATION->SetTitle($title);
 require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/include/prolog_admin_after.php");
 
@@ -1482,6 +1478,6 @@ if(empty($arGrActionAr))
 $lAdmin->DisplayList();
 ?>
 
-<? CFilemanUtils::BuildDialogContent($site);?>
+<? CFilemanUtils::BuildDialogContent($site); ?>
 
 <?require($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/include/epilog_admin.php");?>

@@ -1,12 +1,5 @@
 <?
 /**
- * Freetrix Framework
- * @package freetrix
- * @subpackage main
- * @copyright 2001-2013 Freetrix
- */
-
-/**
  * Freetrix vars
  * @global CUser $USER
  * @global CMain $APPLICATION
@@ -22,6 +15,7 @@ IncludeModuleLangFile(__FILE__);
 
 if(strlen($APPLICATION->GetTitle())<=0)
 	$APPLICATION->SetTitle(GetMessage("MAIN_PROLOG_ADMIN_TITLE"));
+
 
 $aUserOpt = CUserOptions::GetOption("admin_panel", "settings");
 $aUserOptGlobal = CUserOptions::GetOption("global", "settings");
@@ -44,6 +38,7 @@ if (!defined('ADMIN_SECTION_LOAD_AUTH') || !ADMIN_SECTION_LOAD_AUTH):
 	$arDirect = $direct->Fetch();
 	if($arDirect["DIRECTION"] == "N")
 		$direction = ' dir="rtl"';
+
 
 ?>
 <!DOCTYPE html>
@@ -68,6 +63,8 @@ window.document.title = '<?echo CUtil::JSEscape($APPLICATION->GetTitle(false, tr
 </script>
 <?
 endif;
+
+
 
 $APPLICATION->AddBufferContent(array($adminPage, "ShowCSS"));
 echo $adminPage->ShowScript();

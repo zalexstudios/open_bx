@@ -3,7 +3,6 @@ class CSnippets
 {
 	public static function LoadList($Params)
 	{
-		global $CACHE_MANAGER;
 
 		$template = CFileMan::SecurePathVar($Params["template"]);
 		if ($template == '')
@@ -15,14 +14,6 @@ class CSnippets
 		if ($Params['bClearCache'])
 			CSnippets::ClearCache();
 
-		$ttl = 30 * 24 * 60 * 60; // 30 days
-		if($CACHE_MANAGER->Read($ttl, "fileman_snippet_array"))
-		{
-			$CACHE_SNIPPETS = $CACHE_MANAGER->Get("fileman_snippet_array");
-			if (isset($CACHE_SNIPPETS[$template]))
-				$arSNIPPETS = $CACHE_SNIPPETS[$template];
-		}
-
 		if (!$arSNIPPETS || !is_array($arSNIPPETS))
 		{
 			$arSNIPPETS = Array();
@@ -33,7 +24,6 @@ class CSnippets
 				CSnippets::HandleForTemplate($template, $arSNIPPETS, $arTemplateKeys);
 
 			$CACHE_SNIPPETS[$template] = $arSNIPPETS;
-			$CACHE_MANAGER->Set("fileman_snippet_array", $CACHE_SNIPPETS);
 		}
 
 		if ($Params['returnArray'])
@@ -177,9 +167,7 @@ class CSnippets
 
 	function ClearCache()
 	{
-		global $CACHE_MANAGER;
-		$CACHE_MANAGER->Clean("fileman_snippet_array");
-		$CACHE_MANAGER->Clean("fileman_snippet_group");
+		return true;
 	}
 
 	function GetCode($path)
@@ -349,7 +337,6 @@ window.operation_success = true;
 
 	public static function GetGroupList($Params)
 	{
-		global $CACHE_MANAGER;
 		$template = CFileMan::SecurePathVar($Params['template']);
 
 		$arGroups = false;
@@ -358,20 +345,12 @@ window.operation_success = true;
 		if ($Params['bClearCache'])
 			CSnippets::ClearCache();
 
-		$ttl = 30 * 24 * 60 * 60; // 30 days
-		if($CACHE_MANAGER->Read($ttl, "fileman_snippet_group"))
-		{
-			$CACHE_SNIPPETS = $CACHE_MANAGER->Get("fileman_snippet_group");
-			if (isset($CACHE_SNIPPETS[$template]))
-				$arGroups = $CACHE_SNIPPETS[$template];
-		}
 
 		if (!$arGroups || !is_array($arGroups))
 		{
 			$arGroups = Array();
 			CSnippets::InspectDir($arGroups, "", $template);
 			$CACHE_SNIPPETS[$template] = $arGroups;
-			$CACHE_MANAGER->Set("fileman_snippet_group", $CACHE_SNIPPETS);
 		}
 		return $arGroups;
 	}

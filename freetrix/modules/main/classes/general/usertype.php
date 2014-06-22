@@ -153,33 +153,10 @@ class CAllUserTypeEntity extends CDBResult
 		return $cache[$ID];
 	}
 
-	/**
-	 * Функция для выборки метаданных пользовательских свойств.
-	 *
-	 * <p>Возвращает CDBResult - выборку в зависимости от фильтра и сортировки.</p>
-	 * <p>Параметр aSort по умолчанию имеет вид array("SORT"=>"ASC", "ID"=>"ASC").</p>
-	 * <p>Если в aFilter передается LANG, то дополнительно выбираются языковые сообщения.</p>
-	 * @param array $aSort ассоциативный массив сортировки (ID, ENTITY_ID, FIELD_NAME, SORT, USER_TYPE_ID)
-	 * @param array $aFilter ассоциативный массив фильтра со строгим сообветствием (<b>равно</b>) (ID, ENTITY_ID, FIELD_NAME, USER_TYPE_ID, SORT, MULTIPLE, MANDATORY, SHOW_FILTER)
-	 * @return CDBResult
-	 * @static
-	 */
+
 	function GetList($aSort=array(), $aFilter=array())
 	{
-		global $DB, $CACHE_MANAGER;
-
-		if(CACHED_b_user_field!==false)
-		{
-			$cacheId = "b_user_type".md5(serialize($aSort).".".serialize($aFilter));
-			if($CACHE_MANAGER->Read(CACHED_b_user_field, $cacheId, "b_user_field"))
-			{
-				$arResult = $CACHE_MANAGER->Get($cacheId);
-				$res = new CDBResult;
-				$res->InitFromArray($arResult);
-				$res = new CUserTypeEntity($res);
-				return $res;
-			}
-		}
+		global $DB;
 
 		$bLangJoin = false;
 		$arFilter = array();
@@ -270,23 +247,14 @@ class CAllUserTypeEntity extends CDBResult
 				".($bLangJoin? "LEFT JOIN b_user_field_lang UFL on UFL.LANGUAGE_ID = '".$bLangJoin."' AND UFL.USER_FIELD_ID = UF.ID": "")."
 			".$sFilter.$sOrder;
 
-		if(CACHED_b_user_field===false)
-		{
-			$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-		}
-		else
-		{
-			$arResult = array();
-			$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-			while($ar = $res->Fetch())
-				$arResult[]=$ar;
+		$arResult = array();
+		$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		while($ar = $res->Fetch())
+			$arResult[]=$ar;
 
-			/** @noinspection PhpUndefinedVariableInspection */
-			$CACHE_MANAGER->Set($cacheId, $arResult);
 
-			$res = new CDBResult;
-			$res->InitFromArray($arResult);
-		}
+		$res = new CDBResult;
+		$res->InitFromArray($arResult);
 
 		return  new CUserTypeEntity($res);
 	}

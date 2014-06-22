@@ -72,7 +72,7 @@ class CSmile
 
 	public static function add($arFields)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		if (!self::checkFields($arFields, self::CHECK_TYPE_ADD))
 			return false;
@@ -124,7 +124,6 @@ class CSmile
 			}
 		}
 
-		$CACHE_MANAGER->CleanDir("b_smile");
 
 		return $setId;
 	}
@@ -132,7 +131,7 @@ class CSmile
 	public static function update($id, $arFields)
 	{
 		// TODO
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$id = intVal($id);
 		if (!self::checkFields($arFields, self::CHECK_TYPE_UPDATE))
@@ -196,14 +195,12 @@ class CSmile
 			}
 		}
 
-		$CACHE_MANAGER->CleanDir("b_smile");
-
 		return true;
 	}
 
 	public static function delete($id)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$id = intval($id);
 		if ($id <= 0)
@@ -212,14 +209,13 @@ class CSmile
 		$DB->Query("DELETE FROM b_smile WHERE ID = ".$id, true);
 		$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".self::TYPE_SMILE."' AND SID = ".$id, true);
 
-		$CACHE_MANAGER->CleanDir("b_smile");
 
 		return true;
 	}
 
 	public static function deleteBySet($id)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$id = intval($id);
 		if ($id <= 0)
@@ -238,7 +234,6 @@ class CSmile
 			$DB->Query("DELETE FROM b_smile WHERE ID IN (".implode(',', $arDelete).")", true);
 			$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".self::TYPE_SMILE."' AND SID IN (".implode(',', $arDelete).")", true);
 
-			$CACHE_MANAGER->CleanDir("b_smile");
 		}
 
 		return true;
@@ -429,15 +424,7 @@ class CSmile
 		if ($lang <> '')
 			$arFilter["LID"] = htmlspecialcharsbx($lang);
 
-		global $CACHE_MANAGER;
-		$cache_id = "b_smile_".$arFilter["TYPE"]."_".$setId."_".$arFilter["LID"];
 
-		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile"))
-		{
-			$arResult = $CACHE_MANAGER->Get($cache_id);
-		}
-		else
-		{
 			if ($setId != CSmileSet::SET_ID_ALL)
 				$arFilter['SET_ID'] = $setId;
 
@@ -446,9 +433,6 @@ class CSmile
 				'FILTER' => $arFilter,
 			));
 
-			if (CACHED_b_smile !== false)
-				$CACHE_MANAGER->Set($cache_id, $arResult);
-		}
 
 		return $arResult;
 	}
@@ -663,7 +647,7 @@ class CSmileSet
 
 	public static function add($arFields)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$arInsert = array();
 
@@ -695,14 +679,13 @@ class CSmileSet
 			}
 		}
 
-		$CACHE_MANAGER->CleanDir("b_smile_set");
 
 		return $setId;
 	}
 
 	public static function update($id, $arFields)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$id = intVal($id);
 
@@ -738,14 +721,12 @@ class CSmileSet
 			}
 		}
 
-		$CACHE_MANAGER->CleanDir("b_smile_set");
-
 		return true;
 	}
 
 	public static function delete($id)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$id = intval($id);
 
@@ -754,7 +735,6 @@ class CSmileSet
 
 		CSmile::deleteBySet($id);
 
-		$CACHE_MANAGER->CleanDir("b_smile_set");
 
 		return true;
 	}
@@ -982,19 +962,7 @@ class CSmileSet
 		if (strlen($lang) > 0)
 			$lang = htmlspecialcharsbx($lang);
 
-		global $CACHE_MANAGER;
-		$cache_id = "b_smile_set_".$lang;
-
-		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile_set"))
-		{
-			$arResult = $CACHE_MANAGER->Get($cache_id);
-		}
-		else
-		{
-			$arResult = self::getList(Array('ORDER' => Array('SORT' => 'ASC')), $lang);
-			if (CACHED_b_smile !== false)
-				$CACHE_MANAGER->Set($cache_id, $arResult);
-		}
+		$arResult = self::getList(Array('ORDER' => Array('SORT' => 'ASC')), $lang);
 
 		return $arResult;
 	}

@@ -3655,19 +3655,7 @@ class CAllTask
 
 	function GetList($arOrder = array('MODULE_ID'=>'asc','LETTER'=>'asc'),$arFilter=array())
 	{
-		global $DB, $CACHE_MANAGER;;
-
-		if(CACHED_b_task !== false)
-		{
-			$cacheId = "b_task".md5(serialize($arOrder).".".serialize($arFilter));
-			if($CACHE_MANAGER->Read(CACHED_b_task, $cacheId, "b_task"))
-			{
-				$arResult = $CACHE_MANAGER->Get($cacheId);
-				$res = new CDBResult;
-				$res->InitFromArray($arResult);
-				return $res;
-			}
-		}
+		global $DB;
 
 		static $arFields = array(
 			"ID" => array("FIELD_NAME" => "T.ID", "FIELD_TYPE" => "int"),
@@ -3723,33 +3711,15 @@ class CAllTask
 		}
 		$res->InitFromArray($arResult);
 
-		if(CACHED_b_task !== false)
-		{
-			/** @noinspection PhpUndefinedVariableInspection */
-			$CACHE_MANAGER->Set($cacheId, $arResult);
-		}
-
 		return $res;
 	}
 
 
 	function GetOperations($ID, $return_names = false)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 		static $TASK_OPERATIONS_CACHE = array();
 		$ID = intval($ID);
-
-		if (!isset($TASK_OPERATIONS_CACHE[$ID]))
-		{
-			if(CACHED_b_task_operation !== false)
-			{
-				$cacheId = "b_task_operation_".$ID;
-				if($CACHE_MANAGER->Read(CACHED_b_task_operation, $cacheId, "b_task_operation"))
-				{
-					$TASK_OPERATIONS_CACHE[$ID] = $CACHE_MANAGER->Get($cacheId);
-				}
-			}
-		}
 
 		if (!isset($TASK_OPERATIONS_CACHE[$ID]))
 		{
@@ -3769,12 +3739,6 @@ class CAllTask
 			{
 				$TASK_OPERATIONS_CACHE[$ID]['names'][] = $r['NAME'];
 				$TASK_OPERATIONS_CACHE[$ID]['ids'][] = $r['OPERATION_ID'];
-			}
-
-			if(CACHED_b_task_operation !== false)
-			{
-				/** @noinspection PhpUndefinedVariableInspection */
-				$CACHE_MANAGER->Set($cacheId, $TASK_OPERATIONS_CACHE[$ID]);
 			}
 		}
 

@@ -75,149 +75,28 @@ class CMain extends CAllMain
 				$CURR_DOMAIN = substr($CURR_DOMAIN, 0, strpos($CURR_DOMAIN, ':'));
 			$CURR_DOMAIN = trim($CURR_DOMAIN, "\t\r\n\0 .");
 
-			//get site by path
-			if(CACHED_b_lang!==false && CACHED_b_lang_domain!==false)
-			{
-				global $CACHE_MANAGER;
-				$strSql =
-					"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
-					"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
-					"FROM b_lang L, b_culture C ".
-					"WHERE C.ID=L.CULTURE_ID AND L.ACTIVE='Y' ".
-					"ORDER BY ".
-					"	LENGTH(L.DIR) DESC, ".
-					"	L.DOMAIN_LIMITED DESC, ".
-					"	L.SORT ";
-				if($CACHE_MANAGER->Read(CACHED_b_lang, "b_lang".md5($strSql), "b_lang"))
-				{
-					$arLang = $CACHE_MANAGER->Get("b_lang".md5($strSql));
-				}
-				else
-				{
-					$arLang = array();
-					$R = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-					while($row = $R->Fetch())
-						$arLang[] = $row;
-					$CACHE_MANAGER->Set("b_lang".md5($strSql), $arLang);
-				}
+			$strSql =
+				"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
+				"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
+				"FROM b_lang L  ".
+				"	LEFT JOIN b_lang_domain LD ON L.LID=LD.LID AND '".$DB->ForSql($CURR_DOMAIN, 255)."' LIKE CONCAT('%', LD.DOMAIN) ".
+				"	INNER JOIN b_culture C ON C.ID=L.CULTURE_ID ".
+				"WHERE ".
+				"	('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)".
+				"	AND L.ACTIVE='Y' ".
+				"ORDER BY ".
+				"	IF((L.DOMAIN_LIMITED='Y' AND LD.LID IS NOT NULL) OR L.DOMAIN_LIMITED<>'Y', ".
+				"		IF('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%'), 3, 1), ".
+				"		IF('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%'), 2, 0) ".
+				"	) DESC, ".
+				"	LENGTH(L.DIR) DESC, ".
+				"	L.DOMAIN_LIMITED DESC, ".
+				"	L.SORT, ".
+				"	LENGTH(LD.DOMAIN) DESC ";
 
-				$strSql =
-					"SELECT  ".
-					"LD.LID as LD_LID,LD.DOMAIN as LD_DOMAIN ".
-					"FROM  ".
-					"	 b_lang_domain LD  ".
-					"ORDER BY ".
-					"	LENGTH(LD.DOMAIN) DESC ";
-				if($CACHE_MANAGER->Read(CACHED_b_lang_domain, "b_lang_domain2", "b_lang_domain"))
-				{
-					$arLangDomain = $CACHE_MANAGER->Get("b_lang_domain2");
-				}
-				else
-				{
-					$arLangDomain = array();
-					$R = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-					while($row = $R->Fetch())
-						$arLangDomain[$row["LD_LID"]][]=$row;
-					$CACHE_MANAGER->Set("b_lang_domain2", $arLangDomain);
-				}
+			$R = $DB->Query($strSql, false, "File: ".__FILE__." Line:".__LINE__);
+			$res = $R->Fetch();
 
-				$arJoin = array();
-				foreach($arLang as $row)
-				{
-					//LEFT JOIN
-					$bLeft = true;
-					//LEFT JOIN b_lang_domain LD ON L.LID=LD.LID
-					if(array_key_exists($row["LID"], $arLangDomain))
-					{
-						foreach($arLangDomain[$row["LID"]] as $dom)
-						{
-							//AND '".$DB->ForSql($CURR_DOMAIN, 255)."' LIKE CONCAT('%', LD.DOMAIN)
-							if(strcasecmp(substr($CURR_DOMAIN, -strlen($dom["LD_DOMAIN"])), $dom["LD_DOMAIN"]) == 0)
-							{
-								$arJoin[] = $row+$dom;
-								$bLeft = false;
-							}
-						}
-					}
-					if($bLeft)
-					{
-						$arJoin[] = $row+array("LD_LID"=>"","LD_DOMAIN"=>"");
-					}
-				}
-				$A = array();
-				foreach($arJoin as $row)
-				{
-					//WHERE ('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)
-					if($row["LD_LID"]!="" || strcasecmp(substr($cur_dir, 0, strlen($row["DIR"])), $row["DIR"]) == 0)
-						$A[]=$row;
-				}
-
-				$res=false;
-				if($res===false)
-				{
-					foreach($A as $row)
-					{
-						if(
-							(strcasecmp(substr($cur_dir, 0, strlen($row["DIR"])), $row["DIR"]) == 0)
-							&& (($row["DOMAIN_LIMITED"]=="Y" && $row["LD_LID"]!="")||$row["DOMAIN_LIMITED"]!="Y")
-						)
-						{
-							$res=$row;
-							break;
-						}
-					}
-				}
-				if($res===false)
-				{
-					foreach($A as $row)
-					{
-						if(strncasecmp($cur_dir, $row["DIR"], strlen($cur_dir)) == 0)
-						{
-							$res=$row;
-							break;
-						}
-					}
-				}
-				if($res===false)
-				{
-					foreach($A as $row)
-					{
-						if(($row["DOMAIN_LIMITED"] == "Y" && $row["LD_LID"] != "") || $row["DOMAIN_LIMITED"] != "Y")
-						{
-							$res=$row;
-							break;
-						}
-					}
-				}
-				if($res===false && count($A)>0)
-				{
-					$res=$A[0];
-				}
-			}
-			else
-			{
-				$strSql =
-					"SELECT L.*, L.LID as ID, L.LID as SITE_ID, ".
-					"	C.FORMAT_DATE, C.FORMAT_DATETIME, C.FORMAT_NAME, C.WEEK_START, C.CHARSET, C.DIRECTION ".
-					"FROM b_lang L  ".
-					"	LEFT JOIN b_lang_domain LD ON L.LID=LD.LID AND '".$DB->ForSql($CURR_DOMAIN, 255)."' LIKE CONCAT('%', LD.DOMAIN) ".
-					"	INNER JOIN b_culture C ON C.ID=L.CULTURE_ID ".
-					"WHERE ".
-					"	('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%') OR LD.LID IS NOT NULL)".
-					"	AND L.ACTIVE='Y' ".
-					"ORDER BY ".
-					"	IF((L.DOMAIN_LIMITED='Y' AND LD.LID IS NOT NULL) OR L.DOMAIN_LIMITED<>'Y', ".
-					"		IF('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%'), 3, 1), ".
-					"		IF('".$DB->ForSql($cur_dir)."' LIKE CONCAT(L.DIR, '%'), 2, 0) ".
-					"	) DESC, ".
-					"	LENGTH(L.DIR) DESC, ".
-					"	L.DOMAIN_LIMITED DESC, ".
-					"	L.SORT, ".
-					"	LENGTH(LD.DOMAIN) DESC ";
-
-				$R = $DB->Query($strSql, false, "File: ".__FILE__." Line:".__LINE__);
-				$res = $R->Fetch();
-			}
 
 			if($res)
 			{
@@ -250,10 +129,8 @@ class CSite extends CAllSite
 	function GetCurTemplate()
 	{
 		/** @noinspection PhpUnusedLocalVariableInspection */
-		global $DB, $APPLICATION, $USER, $CACHE_MANAGER;
-
-		if(CACHED_b_site_template===false)
-		{
+		global $DB, $APPLICATION, $USER;
+		
 			$strSql = "
 				SELECT
 					".CMain::__GetConditionFName().",
@@ -274,42 +151,7 @@ class CSite extends CAllSite
 				if(($path = getLocalPath("templates/".$ar["TEMPLATE"], FX_PERSONAL_ROOT)) !== false && is_dir($_SERVER["DOCUMENT_ROOT"].$path))
 					return $ar["TEMPLATE"];
 			}
-		}
-		else
-		{
-			if($CACHE_MANAGER->Read(CACHED_b_site_template, "b_site_template"))
-			{
-				$arSiteTemplateBySite = $CACHE_MANAGER->Get("b_site_template");
-			}
-			else
-			{
-				$dbr = $DB->Query("
-					SELECT
-						".CMain::__GetConditionFName().",
-						TEMPLATE,
-						SITE_ID
-					FROM
-						b_site_template
-					ORDER BY
-						SITE_ID, if(length(".CMain::__GetConditionFName().")>0, 1, 2), SORT
-				");
-				$arSiteTemplateBySite = array();
-				while($ar = $dbr->Fetch())
-					$arSiteTemplateBySite[$ar['SITE_ID']][]=$ar;
-				$CACHE_MANAGER->Set("b_site_template", $arSiteTemplateBySite);
-			}
-			if(is_array($arSiteTemplateBySite[SITE_ID]))
-			{
-				foreach($arSiteTemplateBySite[SITE_ID] as $ar)
-				{
-					$strCondition = trim($ar["CONDITION"]);
-					if(strlen($strCondition)>0 && (!@eval("return ".$strCondition.";")))
-						continue;
-					if(($path = getLocalPath("templates/".$ar["TEMPLATE"], FX_PERSONAL_ROOT)) !== false && is_dir($_SERVER["DOCUMENT_ROOT"].$path))
-						return $ar["TEMPLATE"];
-				}
-			}
-		}
+		
 
 		return ".default";
 	}

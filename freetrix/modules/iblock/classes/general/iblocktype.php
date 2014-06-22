@@ -51,8 +51,6 @@ class CIBlockType
 	{
 		/** @global CDatabase $DB */
 		global $DB;
-		/** @global CCacheManager $CACHE_MANAGER */
-		global $CACHE_MANAGER;
 		$bLang = false;
 		$bNameSort = false;
 		$strSqlSearch = "1=1\n";
@@ -133,19 +131,11 @@ class CIBlockType
 		}
 		else
 		{
-			if ($CACHE_MANAGER->Read(CACHED_b_iblock_type, $cache_id = "b_iblock_type".md5($strSql), "b_iblock_type"))
-			{
-				$arResult = $CACHE_MANAGER->Get($cache_id);
-			}
-			else
-			{
 				$arResult = array();
 				$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 				while ($ar = $res->Fetch())
 					$arResult[] = $ar;
 
-				$CACHE_MANAGER->Set($cache_id, $arResult);
-			}
 			$res = new CDBResult;
 			$res->InitFromArray($arResult);
 		}

@@ -247,10 +247,7 @@ class CSticker
 
 	function ClearCache()
 	{
-		global $CACHE_MANAGER;
-		$cache = new CPHPCache;
-		$cache->CleanDir("stickers/");
-		$CACHE_MANAGER->CleanDir("fileman_stickers_count");
+		return true;
 	}
 
 	function GetById($id)
@@ -331,14 +328,8 @@ class CSticker
 
 	function GetCount($Params)
 	{
-		global $DB, $USER, $CACHE_MANAGER;
+		global $DB, $USER;
 		$userId = $USER->GetId();
-
-		$cacheId = 'stickers_count_'.$userId."_".$Params["PAGE_URL"];
-		$bCache = CACHED_stickers_count !== false;
-
-		if($bCache && $CACHE_MANAGER->Read(CACHED_stickers_count, $cacheId, "fileman_stickers_count"))
-			return $CACHE_MANAGER->Get($cacheId);
 
 		$strSqlSearch = "((ST.PERSONAL='Y' AND ST.CREATED_BY=".intVal($userId).") OR ST.PERSONAL='N')";
 		$strSqlSearch .= "\n AND ST.CLOSED='N' AND ST.DELETED='N' AND ST.SITE_ID='".$DB->ForSql($Params['SITE_ID'])."'";
@@ -360,9 +351,6 @@ class CSticker
 		$count = 0;
 		if($arRes = $res->Fetch())
 			$count = $arRes['CNT'];
-
-		if ($bCache)
-			$CACHE_MANAGER->Set($cacheId, $count);
 
 		return $count;
 	}
@@ -798,7 +786,7 @@ class blogTextParser1
 
 	function blogTextParser1($strLang = False, $pathToSmile = false)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 		if ($strLang===False)
 			$strLang = LANGUAGE_ID;
 		$this->path_to_smile = $pathToSmile;
@@ -807,45 +795,6 @@ class blogTextParser1
 		$this->imageHeight = COption::GetOptionString("blog", "image_max_height", 600);
 
 		$this->smiles = array();
-
-		// if($CACHE_MANAGER->Read(10, "b_blog_smile"))
-		// {
-			// $arSmiles = $CACHE_MANAGER->Get("b_blog_smile");
-		// }
-		// else
-		// {
-			// $db_res = CBlogSmile::GetList(array("SORT" => "ASC"), array("SMILE_TYPE" => "S"/*, "LANG_LID" => $strLang*/), false, false, Array("LANG_LID", "ID", "IMAGE", "DESCRIPTION", "TYPING", "SMILE_TYPE", "SORT"));
-			// while ($res = $db_res->Fetch())
-			// {
-				// $tok = strtok($res["TYPING"], " ");
-				// while ($tok)
-				// {
-					// $arSmiles[$res["LANG_LID"]][] = array(
-										// "TYPING" => $tok,
-										// "IMAGE"  => stripslashes($res["IMAGE"]),
-										// "DESCRIPTION" => stripslashes($res["NAME"]));
-
-					// $tok = strtok(" ");
-				// }
-			// }
-
-			// function sortlen($a, $b) {
-				// if (strlen($a["TYPING"]) == strlen($b["TYPING"])) {
-					// return 0;
-				// }
-				// return (strlen($a["TYPING"]) > strlen($b["TYPING"])) ? -1 : 1;
-			// }
-
-			// foreach ($arSmiles as $LID => $arSmilesLID)
-			// {
-				// uasort($arSmilesLID, 'sortlen');
-				// $arSmiles[$LID] = $arSmilesLID;
-			// }
-
-			// $CACHE_MANAGER->Set("b_blog_smile", $arSmiles);
-
-		// }
-		// $this->smiles = $arSmiles[$strLang];
 	}
 
 	function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N"), $arParams = Array())

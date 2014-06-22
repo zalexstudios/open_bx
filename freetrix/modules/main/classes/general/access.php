@@ -46,21 +46,12 @@ class CAccess
 
 	protected static function CheckUserCodes($provider, $USER_ID)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$USER_ID = intval($USER_ID);
 
 		if(!isset(self::$arChecked[$provider][$USER_ID]))
 		{
-			if (
-				CACHED_b_user_access_check !== false
-				&& $CACHE_MANAGER->Read(CACHED_b_user_access_check, "access_check".$USER_ID, "access_check")
-			)
-			{
-				self::$arChecked = $CACHE_MANAGER->Get("access_check".$USER_ID);
-			}
-			else
-			{
 				$res = $DB->Query("
 					select *
 					from b_user_access_check
@@ -69,10 +60,6 @@ class CAccess
 
 				while($arRes = $res->Fetch())
 					self::$arChecked[$arRes["PROVIDER_ID"]][$USER_ID] = true;
-
-				if (CACHED_b_user_access_check !== false)
-					$CACHE_MANAGER->Set("access_check".$USER_ID, self::$arChecked);
-			}
 
 			foreach(self::$arAuthProviders as $provider_id=>$dummy)
 				if(!isset(self::$arChecked[$provider_id][$USER_ID]))
@@ -118,7 +105,7 @@ class CAccess
 
 	protected static function UpdateStat($provider, $USER_ID)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 		$USER_ID = intval($USER_ID);
 
 		$res = $DB->Query("
@@ -127,14 +114,14 @@ class CAccess
 			FROM b_user
 			WHERE ID=".$USER_ID
 		);
-		$CACHE_MANAGER->Clean("access_check".$USER_ID, "access_check");
+		
 
 		self::$arChecked[$provider][$USER_ID] = ($res->AffectedRowsCount() > 0);
 	}
 
 	public static function ClearStat($provider=false, $USER_ID=false)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 
 		$arWhere = array();
 		if($provider !== false)
@@ -151,25 +138,25 @@ class CAccess
 		if($provider === false && $USER_ID === false)
 		{
 			self::$arChecked = array();
-			$CACHE_MANAGER->CleanDir("access_check");
+			
 		}
 		elseif($USER_ID === false)
 		{
 			unset(self::$arChecked[$provider]);
-			$CACHE_MANAGER->CleanDir("access_check");
+			
 		}
 		elseif($provider === false)
 		{
 			foreach(self::$arChecked as $pr=>$ar)
 				unset(self::$arChecked[$pr][$USER_ID]);
-			$CACHE_MANAGER->Clean("access_check".$USER_ID, "access_check");
-			$CACHE_MANAGER->Clean("access_codes".$USER_ID, "access_check");
+			
+			
 		}
 		else
 		{
 			unset(self::$arChecked[$provider][$USER_ID]);
-			$CACHE_MANAGER->Clean("access_check".$USER_ID, "access_check");
-			$CACHE_MANAGER->Clean("access_codes".$USER_ID, "access_check");
+			
+			
 		}
 	}
 
@@ -208,28 +195,14 @@ class CAccess
 
 	public static function GetUserCodesArray($USER_ID, $arFilter=array())
 	{
-		global $CACHE_MANAGER;
 		$USER_ID = intval($USER_ID);
 
-		if (
-			CACHED_b_user_access_check !== false
-			&& $CACHE_MANAGER->Read(CACHED_b_user_access_check, "access_codes".$USER_ID, "access_check")
-		)
-		{
-			return $CACHE_MANAGER->Get("access_codes".$USER_ID);
-		}
-		else
-		{
-			$arCodes = array();
-			$res = CAccess::GetUserCodes($USER_ID, $arFilter);
-			while($arRes = $res->Fetch())
-				$arCodes[] = $arRes["ACCESS_CODE"];
+		$arCodes = array();
+		$res = CAccess::GetUserCodes($USER_ID, $arFilter);
+		while($arRes = $res->Fetch())
+			$arCodes[] = $arRes["ACCESS_CODE"];
 
-			if (CACHED_b_user_access_check !== false)
-				$CACHE_MANAGER->Set("access_codes".$USER_ID, $arCodes);
-
-			return $arCodes;
-		}
+		return $arCodes;
 	}
 
 	public function GetFormHtml($arParams=false)

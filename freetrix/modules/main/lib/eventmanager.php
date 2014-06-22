@@ -228,47 +228,38 @@ class EventManager
 
 	protected function loadEventHandlers()
 	{
-		$cache = Application::getInstance()->getManagedCache();
-		if ($cache->read(3600, self::$cacheKey))
-		{
-			$arEvents = $cache->get(self::$cacheKey);
-		}
-		else
-		{
-			$arEvents = array();
+		
+		$arEvents = array();
 
-			$con = Application::getConnection();
-			$rs = $con->query("
-				SELECT FROM_MODULE_ID, MESSAGE_ID, SORT, TO_MODULE_ID, TO_PATH,
-					TO_CLASS, TO_METHOD, TO_METHOD_ARG, VERSION
-				FROM b_module_to_module m2m
-					INNER JOIN b_module m ON (m2m.TO_MODULE_ID = m.ID)
-				ORDER BY SORT
-			");
-			while ($ar = $rs->fetch())
+		$con = Application::getConnection();
+		$rs = $con->query("
+			SELECT FROM_MODULE_ID, MESSAGE_ID, SORT, TO_MODULE_ID, TO_PATH,
+				TO_CLASS, TO_METHOD, TO_METHOD_ARG, VERSION
+			FROM b_module_to_module m2m
+				INNER JOIN b_module m ON (m2m.TO_MODULE_ID = m.ID)
+			ORDER BY SORT
+		");
+		while ($ar = $rs->fetch())
+		{
+			$ar['TO_NAME'] = $this->formatEventName(
+				array(
+					"TO_MODULE_ID" => $ar["TO_MODULE_ID"],
+					"TO_CLASS" => $ar["TO_CLASS"],
+					"TO_METHOD" => $ar["TO_METHOD"]
+				)
+			);
+			$ar["~FROM_MODULE_ID"] = strtoupper($ar["FROM_MODULE_ID"]);
+			$ar["~MESSAGE_ID"] = strtoupper($ar["MESSAGE_ID"]);
+			if (strlen($ar["TO_METHOD_ARG"]) > 0)
 			{
-				$ar['TO_NAME'] = $this->formatEventName(
-					array(
-						"TO_MODULE_ID" => $ar["TO_MODULE_ID"],
-						"TO_CLASS" => $ar["TO_CLASS"],
-						"TO_METHOD" => $ar["TO_METHOD"]
-					)
-				);
-				$ar["~FROM_MODULE_ID"] = strtoupper($ar["FROM_MODULE_ID"]);
-				$ar["~MESSAGE_ID"] = strtoupper($ar["MESSAGE_ID"]);
-				if (strlen($ar["TO_METHOD_ARG"]) > 0)
-				{
-					$ar["TO_METHOD_ARG"] = unserialize($ar["TO_METHOD_ARG"]);
-				}
-				else
-				{
-					$ar["TO_METHOD_ARG"] = array();
-				}
-
-				$arEvents[] = $ar;
+				$ar["TO_METHOD_ARG"] = unserialize($ar["TO_METHOD_ARG"]);
+			}
+			else
+			{
+				$ar["TO_METHOD_ARG"] = array();
 			}
 
-			$cache->set(self::$cacheKey, $arEvents);
+			$arEvents[] = $ar;
 		}
 
 		if (!is_array($arEvents))

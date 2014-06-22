@@ -29,4 +29,5 @@ require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/admin_tools.php");
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/interface/init_admin.php");
 
 CMain::PrologActions();
+
 ?>

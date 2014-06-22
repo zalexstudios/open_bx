@@ -3,6 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main"."/SetCorePath.ph
 require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/Start.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/classes/general/virtual_io.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/classes/general/virtual_file.php");
+
 $Application= \Freetrix\Main\Application::getInstance();
 
 $Application->initializeExtendedKernel(array(
@@ -102,7 +103,6 @@ require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/ur
 			"CEditArea" => "public/edit_area.php",
 			"CComponentPanel" => "public/edit_area.php",
 			"CTextParser" => "classes/general/textparser.php",
-			//"CPHPCacheFiles" => "classes/general/cache_files.php",
 			"CDataXML" => "classes/general/xml.php",
 			"CXMLFileStream" => "classes/general/xml.php",
 			"CRsaProvider" => "classes/general/rsasecurity.php",
@@ -421,12 +421,4 @@ if((!defined("NOT_CHECK_PERMISSIONS") || NOT_CHECK_PERMISSIONS!==true) &&(!defin
 
 		$GLOBALS["APPLICATION"]->AuthForm($_1134959765);
 	}
-}
-
-
-if(isset($_632134019) && $_632134019 == 404 )
-{
-	//Send header Status if 404 
-	//if(COption::GetOptionString(getDecodedValue(901),getDecodedValue(902),getDecodedValue(903))==getDecodedValue(904))
-		//CHTTP::SetStatus(getDecodedValue(905));
 }

@@ -10,10 +10,11 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/lib/loader.php");
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/Helpers.php"); 
 
 \Freetrix\Main\Loader::registerAutoLoadClasses( "main", 
-array( "freetrix\main\application" => "lib/application.php", 
+array( 
+"freetrix\main\application" => "lib/application.php", 
 "freetrix\main\httpapplication" => "lib/httpapplication.php", 
 "freetrix\main\argumentexception" => "lib/exception.php",
- "freetrix\main\argumentnullexception" => "lib/exception.php",
+"freetrix\main\argumentnullexception" => "lib/exception.php",
 "freetrix\main\argumentoutofrangeexception" => "lib/exception.php",
 "freetrix\main\argumenttypeexception" => "lib/exception.php", 
 "freetrix\main\notimplementedexception" => "lib/exception.php",
@@ -34,14 +35,10 @@ array( "freetrix\main\application" => "lib/application.php",
 "freetrix\main\config\configuration" => "lib/config/configuration.php",
  "freetrix\main\config\option" => "lib/config/option.php",
 "freetrix\main\context\culture" => "lib/context/culture.php", 
-"freetrix\main\context\site" => "lib/context/site.php", 
-"freetrix\main\data\cache" => "lib/data/cache.php", 
-"freetrix\main\data\cacheenginenone" => "lib/data/cacheenginenone.php", 
+"freetrix\main\context\site" => "lib/context/site.php",  
 "freetrix\main\data\connection" => "lib/data/connection.php",
 "freetrix\main\data\connectionpool" => "lib/data/connectionpool.php",
- "freetrix\main\data\icacheengine" => "lib/data/cache.php", 
 "freetrix\main\data\hsphpreadconnection" => "lib/data/hsphpreadconnection.php", 
-"freetrix\main\data\managedcache" => "lib/data/managedcache.php",
 "freetrix\main\data\nosqlconnection" => "lib/data/nosqlconnection.php",
 "freetrix\main\db\arrayresult" => "lib/db/arrayresult.php", 
 "freetrix\main\db\result" => "lib/db/result.php", 
@@ -98,7 +95,6 @@ define("FX_DIR_PERMISSIONS", 0755);
 @umask(~FX_DIR_PERMISSIONS);
 define("FX_DISABLE_INDEX_PAGE", true);
 define("FX_UTF_PCRE_MODIFIER", "u"); 
-define("CACHED_b_user_access_check", false ); 
 define("POST_FORM_ACTION_URI", htmlspecialcharsbx("/".ltrim($_SERVER["REQUEST_URI"], "/"))); 
 
 $connectionSettings = \Freetrix\Main\Config\Configuration::getValue('connections');
@@ -128,7 +124,5 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/classes/general/p
 require_once($_SERVER["DOCUMENT_ROOT"]."/freetrix/modules/main/classes/general/charset_converter.php"); 
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/".$DBType."/main.php"); 
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/".$DBType."/option.php"); 
-require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/cache.php"); 
-require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/cache_html.php"); 
 require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/module.php"); 
 error_reporting(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE); 

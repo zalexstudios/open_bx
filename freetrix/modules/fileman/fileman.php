@@ -94,7 +94,7 @@ class CFileMan
 	var $arFILE_TYPES;
 
 	function OnPanelCreate()
-	{
+	{ 
 		global $APPLICATION, $REQUEST_URI;
 		if($APPLICATION->GetGroupRight("fileman")<="D")
 			return;
@@ -329,7 +329,7 @@ class CFileMan
 	}
 
 	function GetFileName($path)
-	{
+	{ 
 		return GetFileName($path);
 	}
 

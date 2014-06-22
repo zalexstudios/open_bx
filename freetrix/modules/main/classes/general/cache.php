@@ -379,7 +379,6 @@ class CCacheManager
 	public function __construct()
 	{
 		$app = \Freetrix\Main\Application::getInstance();
-		$this->managedCache = $app->getManagedCache();
 		$this->taggedCache = $app->getTaggedCache();
 	}
 

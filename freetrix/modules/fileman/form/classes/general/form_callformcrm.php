@@ -1158,38 +1158,27 @@ class CFormCrmSender
 
 	public function GetFields($bReload = false)
 	{
-		global $CACHE_MANAGER;
 
 		if (!$this->arLink)
 			return false;
 
 		if ($bReload)
 		{
-			$CACHE_MANAGER->Clean($this->_cacheId(), 'form_crm_data');
 			$this->arCRMFields = null;
 		}
 
 		if (!$this->arCRMFields)
 		{
-			if ($CACHE_MANAGER->Read(self::FIELDS_CACHE_TTL, $this->_cacheId(), 'form_crm_data') && !$bReload)
-			{
-				$this->arCRMFields = $CACHE_MANAGER->Get($this->_cacheId());
-			}
-			else
-			{
 				$result = $this->_query('lead.get_fields');
 				if ($result !== false)
 				{
 					$data = $result->data();
 					$this->arCRMFields = $data['FIELDS'];
-
-					$CACHE_MANAGER->Set($this->_cacheId(), $this->arCRMFields);
 				}
 				else
 				{
 					return false;
 				}
-			}
 		}
 
 		return $this->arCRMFields;

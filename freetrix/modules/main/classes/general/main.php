@@ -4037,13 +4037,7 @@ abstract class CAllMain
 		}
 		else
 		{
-			global $CACHE_MANAGER;
-			if($CACHE_MANAGER->Read(CACHED_b_lang_domain, "b_lang_domain", "b_lang_domain"))
-			{
-				$arLangDomain = $CACHE_MANAGER->Get("b_lang_domain");
-			}
-			else
-			{
+			
 				$arLangDomain = array("DOMAIN"=>array(), "LID"=>array());
 				$res = $DB->Query("SELECT * FROM b_lang_domain ORDER BY ".$DB->Length("DOMAIN"));
 				while($ar = $res->Fetch())
@@ -4051,8 +4045,7 @@ abstract class CAllMain
 					$arLangDomain["DOMAIN"][]=$ar;
 					$arLangDomain["LID"][$ar["LID"]][]=$ar;
 				}
-				$CACHE_MANAGER->Set("b_lang_domain", $arLangDomain);
-			}
+
 			//$strSql = "'".$DB->ForSql($_SERVER["HTTP_HOST"])."' like ".$DB->Concat("'%.'", "DOMAIN")."";
 			foreach($arLangDomain["DOMAIN"] as $ar)
 			{
@@ -4284,6 +4277,7 @@ abstract class CAllMain
 
 	function AddBufferContent($callback)
 	{
+		
 		$args = array();
 		$args_num = func_num_args();
 		if($args_num>1)
@@ -4295,18 +4289,29 @@ abstract class CAllMain
 			echo call_user_func_array($callback, $args);
 			return;
 		}
+
 		$this->buffer_content[] = ob_get_contents();
-		$this->buffer_content[] = "";
+		
+		$this->buffer_content[] = ""; //????
 		$this->buffer_content_type[] = array("F"=>$callback, "P"=>$args);
 		$this->buffer_man = true;
 		$this->auto_buffer_cleaned = false;
 		ob_end_clean();
 		$this->buffer_man = false;
 		$this->buffered = true;
+
 		if($this->auto_buffer_cleaned) // cross buffer fix
+		{
 			ob_start(array(&$this, "EndBufferContent"));
+		}
 		else
+		{
 			ob_start();
+		}
+		
+			
+
+
 	}
 
 	function RestartBuffer()
@@ -5279,21 +5284,7 @@ class CAllSite
 
 	function GetList(&$by, &$order, $arFilter=array())
 	{
-		global $DB, $CACHE_MANAGER;
-
-		if(CACHED_b_lang!==false)
-		{
-			$cacheId = "b_lang".md5($by.".".$order.".".serialize($arFilter));
-			if($CACHE_MANAGER->Read(CACHED_b_lang, $cacheId, "b_lang"))
-			{
-				$arResult = $CACHE_MANAGER->Get($cacheId);
-
-				$res = new CDBResult;
-				$res->InitFromArray($arResult);
-				$res = new _CLangDBResult($res);
-				return $res;
-			}
-		}
+		global $DB;
 
 		$strSqlSearch = "";
 		$bIncDomain = false;
@@ -5381,8 +5372,6 @@ class CAllSite
 			while($ar = $res->Fetch())
 				$arResult[]=$ar;
 
-			/** @noinspection PhpUndefinedVariableInspection */
-			$CACHE_MANAGER->Set($cacheId, $arResult);
 
 			$res = new CDBResult;
 			$res->InitFromArray($arResult);
@@ -5671,20 +5660,13 @@ class _CLangDBResult extends CDBResult
 				}
 				else
 				{
-					if($CACHE_MANAGER->Read(CACHED_b_lang_domain, "b_lang_domain", "b_lang_domain"))
+
+					$arLangDomain = array("DOMAIN"=>array(), "LID"=>array());
+					$rs = $DB->Query("SELECT * FROM b_lang_domain ORDER BY ".$DB->Length("DOMAIN"));
+					while($ar = $rs->Fetch())
 					{
-						$arLangDomain = $CACHE_MANAGER->Get("b_lang_domain");
-					}
-					else
-					{
-						$arLangDomain = array("DOMAIN"=>array(), "LID"=>array());
-						$rs = $DB->Query("SELECT * FROM b_lang_domain ORDER BY ".$DB->Length("DOMAIN"));
-						while($ar = $rs->Fetch())
-						{
-							$arLangDomain["DOMAIN"][]=$ar;
-							$arLangDomain["LID"][$ar["LID"]][]=$ar;
-						}
-						$CACHE_MANAGER->Set("b_lang_domain", $arLangDomain);
+						$arLangDomain["DOMAIN"][]=$ar;
+						$arLangDomain["LID"][$ar["LID"]][]=$ar;
 					}
 					$res["DOMAINS"] = "";
 					if(is_array($arLangDomain["LID"][$res["LID"]]))

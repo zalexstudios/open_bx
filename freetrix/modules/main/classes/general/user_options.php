@@ -96,74 +96,32 @@ class CUserOptions
 
 	public static function GetOption($category, $name, $default_value = false, $user_id = false)
 	{
-		global $DB, $USER, $CACHE_MANAGER;
+		global $DB, $USER;
 
 		if ($user_id === false && is_object($USER) && ((get_class($USER) === 'CUser') || ($USER instanceof CUser)))
 			$user_id = $USER->GetID();
 
 		$user_id = intval($user_id);
-
-		if (!isset(self::$cache[$user_id][$category][$name]))
+		if ($user_id > 0)
 		{
-			if ($user_id > 0)
+			$strSql = "
+				SELECT CATEGORY, NAME, VALUE, COMMON
+				FROM b_user_option
+				WHERE (USER_ID=".$user_id." OR USER_ID IS NULL AND COMMON='Y')
+					AND CATEGORY='".$DB->ForSql($category)."'
+			";
+
+			$res = $DB->Query($strSql);
+			while ($res_array = $res->Fetch())
 			{
-				// options for specified user from managed cache
-				if (!isset(self::$cache[$user_id][$category]))
-				{
-					$mcache_id = "user_option:".$user_id.":".$category;
-					if ($CACHE_MANAGER->read(3600, $mcache_id, "user_option"))
-					{
-						self::$cache[$user_id][$category] = $CACHE_MANAGER->get($mcache_id);
-					}
-					else
-					{
-						$strSql = "
-							SELECT CATEGORY, NAME, VALUE, COMMON
-							FROM b_user_option
-							WHERE (USER_ID=".$user_id." OR USER_ID IS NULL AND COMMON='Y')
-								AND CATEGORY='".$DB->ForSql($category)."'
-						";
-
-						$res = $DB->Query($strSql);
-						while ($res_array = $res->Fetch())
-						{
-							if (!isset(self::$cache[$user_id][$category][$res_array["NAME"]]) || $res_array["COMMON"] <> 'Y')
-								self::$cache[$user_id][$category][$res_array["NAME"]] = unserialize($res_array["VALUE"]);
-						}
-
-						$CACHE_MANAGER->Set($mcache_id, self::$cache[$user_id][$category]);
-					}
-				}
-
-				if (!isset(self::$cache[$user_id][$category][$name]))
-					return $default_value;
-			}
-			else
-			{
-				// options for user '0' from DB (there are much more options for user '0' than for specific one)
-				if (!isset(self::$cache[$user_id][$category]))
-				{
-					$strSql = "
-						SELECT CATEGORY, NAME, VALUE, COMMON
-						FROM b_user_option
-						WHERE (USER_ID=".$user_id." OR USER_ID IS NULL AND COMMON='Y')
-							AND CATEGORY='".$DB->ForSql($category)."'
-					";
-
-					$res = $DB->Query($strSql);
-					while ($res_array = $res->Fetch())
-					{
-						if (!isset(self::$cache[$user_id][$category][$res_array["NAME"]]) || $res_array["COMMON"] <> 'Y')
-							self::$cache[$user_id][$category][$res_array["NAME"]] = unserialize($res_array["VALUE"]);
-					}
-				}
-
-				if (!isset(self::$cache[$user_id][$category][$name]))
+				if ($res_array["COMMON"] <> 'Y')
+					return unserialize($res_array["VALUE"]);
+				else
 					return $default_value;
 			}
 		}
 
-		return self::$cache[$user_id][$category][$name];
+		return $default_value;
 	}
 
 	public static function SetOption($category, $name, $value, $bCommon = false, $user_id = false)
@@ -205,16 +163,7 @@ class CUserOptions
 				return false;
 		}
 
-		if($bCommon)
-		{
-			$CACHE_MANAGER->cleanDir("user_option");
-			self::$cache = array();
-		}
-		else
-		{
-			$CACHE_MANAGER->clean("user_option:".$user_id.":".$category, "user_option");
-			unset(self::$cache[$user_id][$category]);
-		}
+
 		return true;
 	}
 

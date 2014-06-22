@@ -93,108 +93,18 @@ class CAllFormOutput extends CFormOutput_old
 
 	function IncludeFormCustomTemplate()
 	{
-		if ($this->__check_form_cache())
-		{
-			$FORM =& $this; // create interface for template
-			ob_start();
-			eval('?>'.$this->__cache_tpl.'<?');
-			$strReturn = ob_get_contents();
-			ob_end_clean();
-
-			return $strReturn;
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	function IncludeFormTemplate()
 	{
-		global $APPLICATION;
-		if ($this->__check_form_cache())
-		{
-			$APPLICATION->SetTemplateCSS("form/form.css");
-			$FORM =& $this;
-			eval($this->__cache_tpl);
-
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	function isStatisticIncluded()
 	{
 		return CModule::IncludeModule("statistic");
 	}
-
-	/**
-	 * Private method used to check out for template and template cache file
-	 * Returns true whether tpl file exists and puts its path to private
-	 * property __cache_file_name. Otherwise returns false
-	 *
-	 * @return bool
-	 */
-	function __check_form_cache()
-	{
-		global $CACHE_MANAGER;
-
-		// if no tpl at all - return false
-		if (strlen($this->arForm["FORM_TEMPLATE"]) <= 0 || $this->arForm["USE_DEFAULT_TEMPLATE"] != "N")
-		{
-			$this->arForm["USE_DEFAULT_TEMPLATE"] = "Y";
-			return false;
-		}
-
-		$this->__cache_tpl = '';
-
-		$cache_dir = '/form/templates/'.$this->arForm['ID'];
-		$cache_id = 'form|template|'.$this->arForm['ID'];
-
-		$obCache = new CPHPCache();
-
-		if ($obCache->InitCache(30*86400, $cache_id, $cache_dir))
-		{
-			$res = $obCache->GetVars();
-			$this->__cache_tpl = $res['FORM_TEMPLATE'];
-		}
-		else
-		{
-			$obCache->StartDataCache();
-
-			$CACHE_MANAGER->StartTagCache($cache_dir);
-
-			$CACHE_MANAGER->RegisterTag('forms');
-			$CACHE_MANAGER->RegisterTag('form_'.$this->arForm['ID']);
-
-			$this->__cache_tpl = $res['FORM_TEMPLATE'] = $this->__cache_file_header.$this->arForm['FORM_TEMPLATE'].$this->__cache_file_footer;
-
-			$CACHE_MANAGER->EndTagCache();
-			$obCache->EndDataCache(array('FORM_TEMPLATE' => $this->__cache_tpl));
-		}
-
-		return true;
-	}
-
-	/*
-	function __clear_form_cache_files()
-	{
-		$path = $_SERVER['DOCUMENT_ROOT'].$this->__cache_path;
-		$fname_mask = "form_".$this->WEB_FORM_ID;
-
-		if ($dh = @opendir($path))
-		{
-			while (($fname = @readdir($dh)) !== false)
-			{
-				if (substr($fname, 0, strlen($fname_mask)) == $fname_mask) @unlink($path."/".$fname);
-			}
-			closedir($dh);
-		}
-	}
-	*/
 
 	/**
 	 * Public method used to check whether there were some form validation errors

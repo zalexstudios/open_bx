@@ -1,4 +1,5 @@
 <?
+
 /*patchlimitationmutatormark1*/
 CModule::AddAutoloadClasses(
 	"fileman",
@@ -43,3 +44,4 @@ if(method_exists($GLOBALS["APPLICATION"], 'AddJSKernelInfo'))
 
 	$GLOBALS["APPLICATION"]->AddCSSKernelInfo('fileman',array('/freetrix/js/fileman/light_editor/light_editor.css'));
 }
+
