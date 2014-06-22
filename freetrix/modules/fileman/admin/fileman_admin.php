@@ -556,6 +556,7 @@ while($Elem = $db_DirContent->NavNext(true, "f_"))
 	else
 	{
 		$curFileType = CFileMan::GetFileTypeEx($f_NAME);
+		$f_NAME = !empty($Elem['LOGIC_NAME']) ? $Elem['LOGIC_NAME'] : $f_NAME;
 		if(preg_match('/^\.(.*)?\.menu\.(php|html|php3|php4|php5|php6|phtml)$/', $f_NAME, $regs))
 		{
 			$showFieldIcon = "";

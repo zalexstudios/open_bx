@@ -52,7 +52,7 @@ return array (
         'host' => 'localhost',
         'database' => 'freetrix_cms',
         'login' => 'root',
-        'password' => 'root',
+        'password' => '',
         'options' => 2,
         'debug' => false,
         'debugToFile' => false,

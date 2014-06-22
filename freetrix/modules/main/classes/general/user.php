@@ -600,7 +600,7 @@ abstract class CAllUser extends CDBResult
 			if(COption::GetOptionString("main", "event_log_login_success", "N") === "Y")
 				CEventLog::Log("SECURITY", "USER_AUTHORIZE", "main", $arUser["ID"]);
 
-			CHTMLPagesCache::OnUserLogin();
+			
 
 			return true;
 		}
