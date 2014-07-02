@@ -4,16 +4,7 @@ $GLOBALS["FX_STATE"] = "EB";
 
 if($USER->IsAuthorized() && (!defined("FX_AUTH_FORM") || !FX_AUTH_FORM))
 {
-	$hkInstance = CHotKeys::getInstance();
 
-	$Execs=$hkInstance->GetCodeByClassName("Global");
-	echo $hkInstance->PrintJSExecs($Execs);
-	echo $hkInstance->SetTitle("Global");
-
-	$Execs=$hkInstance->GetCodeByUrl($_SERVER["REQUEST_URI"]);
-
-	echo $hkInstance->PrintJSExecs($Execs);
-	echo $hkInstance->PrintPhpToJSVars();
 
 }
 

@@ -1,0 +1,312 @@
+Архитектура:
+
+Ядро: root/modules/main
+Новые именования файлов ядра: ['bx_root.php':'SetCorePath.php','tools.php':'Helpers.php']
+Схема запуска:
+{
+	'root/index.php' : {
+		include: 'root/freetrix/header.php' : {
+			include: 'root/freetrix/modules/main/include/prolog.php' : {
+				include: 'root/freetrix/modules/main/SetCorePath.php' : {
+					define: ['FX_ROOT','/freetrix']
+					define: ['FX_PERSONAL_ROOT','/freetrix']
+				}
+
+				#Условие на include
+				if_file_exists: ['/freetrix/html_pages/.enabled',{
+					define: ['FREETRIX_STATIC_PAGES','true']
+					include: 'freetrix/modules/main/classes/general/cache_html.php' : {
+						#...cache html logic
+					}
+				}]
+				#Конец условия
+
+				include: '/freetrix/modules/main/include/prolog_before.php' : {
+					define: ['START_EXEC_PROLOG_BEFORE_1','microtime']
+
+					#Вот тут идет подключение главного модуля как модуля
+					include: '/freetrix/modules/main/include.php' : {
+						include: '/freetrix/modules/main/SetCorePath.php' : {
+							reference: [true,'1'] #Повтор, инклю был в айле /main/include/prolog.php
+						}
+						include: '/freetrix/modules/main/Start.php' : {
+							include: '/freetrix/modules/main/SetCorePath.php' : {
+								reference: [true,'2'] #Еще один повтор
+							}
+							include: '/freetrix/modules/main/lib/loader.php' : {
+								#Либа может быть использована для 
+								#предотвращения загрузки всех модулей, кроме main и fileman
+								#По сути своей класс отвечает за использования модулей (include.php файлов в папках modules)
+								include: '/freetrix/modules/#MODULE_NAME#/include.php'
+
+								#\Freetrix\Main\Loader::autoLoad() метод загружает либы
+								#То есть это эквивалент обычному include_once , только загрузка файла идет через
+								#namespace , например \Freetrix\Main\IO\File -> /main/lib/io/file.php
+								include: '/freetrix/modules/#MODULE_NAME#/lib/#lib_file#.php'
+
+								#\Freetrix\Main\Loader::registerAutoLoadClasses() это реализация spl_autoload_register
+								#информация здесь http://www.php.net/manual/ru/language.oop5.autoload.php
+								#Следовательно метод сделан чтобы подгружать классы автоматически из папок /modules/MODULE_NAME/lib
+								#когда они будут создаваться, то __autoload будет искать эти классы в указаных в местах
+								include: '/freetrix/modules/#MODULE_NAME#/[#class.php#][/lib/#class.php]'
+							}
+
+							#Файл содержит кучу функции, которые много где используются
+							#Файл на 6000 строк кода!!
+							include: '/freetrix/modules/main/Helpers.php' : {
+								#Инклюды которые он делает
+								include: '/freetrix/modules/main/jscore.php'
+								include: '/freetrix/modules/main/classes/general/update_client.php'
+								include: '/freetrix/modules/main/countries.php'
+
+								#Также содержитв все функции по работе с языковыми файлами,
+								#то есть тоже подтягивает через include языковые файлы 
+								include: '/freetrix/modules/#LANG_FILES#'
+
+							}
+
+							#registerAutoLoadClasses
+							#Подгрузка главных либ главного модуля
+							include: '/freetrix/modules/main/lib/application.php' : { }
+							include: '/freetrix/modules/main/lib/httpapplication.php' : { }
+							include: '/freetrix/modules/main/lib/exception.php' : { }
+							#... exception.php
+							include: '/freetrix/modules/main/lib/context.php' : { }
+							include: 'lib/httpcontext.php' : { }
+							include: 'lib/event.php' : { }
+							include: 'lib/eventmanager.php' : { }
+							include: 'lib/eventresult.php' : { }
+							include: 'lib/request.php' : { }
+							include: 'lib/httprequest.php' : { }
+							include: 'lib/response.php' : { }
+							include: 'lib/httpresponse.php' : { }
+							include: 'lib/modulemanager.php' : { }
+							include: 'lib/server.php' : { }
+							include: 'lib/config/configuration.php' : { }
+							include: 'lib/config/option.php' : { }
+							#... и другие, смотреть в файле /freetrix/modules/main/Start.php
+
+							#Здесь идет создание application из /freetrix/modules/main/lib/application.php
+							init: {
+								'initializeBasicKernel' : {
+									'initializeExceptionHandler' : { include: '/freetrix/.settings.php' }
+									'initializeCache' : { include: '/freetrix/modules/main/lib/data/cache.php' }
+									'createDatabaseConnection' : { include: '/freetrix/modules/main/lib/data/connectionpool.php' }
+								}
+							}
+
+							#Видимо определяет что prolog.php подключен
+							define: ['B_PROLOG_INCLUDED','true']
+
+							#Вызов функции из файла (создание $GLOBALS учитывает register_globals )
+							include: '/freetrix/modules/main/Helpers.php' : { init: 'FormDecode' }
+
+							#Далее идут define
+							define: ['FX_UTF',true]
+							#....
+
+							#Далее обращение к конфигурации базы
+							include: '/freetrix/.settings' 
+
+							include: '/freetrix/modules/main/classes/#DATABASE_TYPE#/database.php' : {
+								include: '/freetrix/modules/main/classes/general/database.php' : {
+									include: '/freetrix/php_interface/dbconn_error.php'
+									#GetNavPrint делает include
+									include: '#TEMPLATE_PATH#'
+
+									include: '/freetrix/modules/cluster/include.php'
+
+									#Использует компонент через global APPLICATION 
+									include: '/freetrix/components/freetrix/system.pagenavigation/component.php'
+								}
+
+								include: '/freetrix/php_interface/after_connect.php'
+								include: '/freetrix/php_interface/dbquery_error.php'
+								include: '/freetrix/modules/main/include/dbquery_error.php'
+								include: '/freetrix/modules/cluster/include.php' : {
+									reference: [true,'2'] #используется в /freetrix/modules/main/classes/general/database.php
+								}
+
+
+							}
+
+							#Далее еще инклюды #DATABASE_TYPE# = MYSQL
+
+							#Вот эти инклюды это какие то костыли
+							include: '/freetrix/modules/main/classes/general/punycode.php'
+							include: '/freetrix/modules/main/classes/general/charset_converter.php'
+							#end костыли утилиты
+
+							include: '/freetrix/freetrix/modules/main/classes/#DATABASE_TYPE#/main.php' : {
+								include: '/freetrix/modules/main/SetCorePath.php' : {
+									reference: [true,3] #Уже был инклюд
+								}
+
+								#Огромный файл с двумя классами CAllMain и CMain
+								include: '/freetrix/modules/main/classes/general/main.php' : {
+									#IncludeAdminFile()
+									include: '/freetrix/modules/main/include/prolog_admin_after.php' : {
+										define: ['START_EXEC_PROLOG_AFTER_1',time()]
+										#Регистрирует стэйт в глобалс FX_STATE
+										#Далее
+										define: ['FX_ROOT','/freetrix']
+
+										include: '/freetrix/modules/main/interface/init_admin.php' : {
+											#Вот эта либа отвечает за подгрузку стилей в админку и за инит всей админки
+											#По идеее это главный файл который позволяет работать админке
+											include: '/freetrix/modules/main/interface/admin_lib.php' : {
+												#Установка тем для админки
+												define: ['ADMIN_THEMES_PATH','/freetrix/themes']
+
+												#Получение модулей обращение к CModule
+												init: {
+													'CModule::GetList()'
+												}
+
+												#Зависимости
+												include: '/freetrix/modules/main/classes/general/user_options.php'
+												#CUtil:
+												include: '/freetrix/modules/main/Helpers.php'
+												include: '/freetrix/components/freetrix/#COMPONENT#/component.php'
+												include: '/freetrix/modules/main/include/prolog_admin_js.php' : {
+													define: ['START_EXEC_PROLOG_AFTER_1',time]
+													#Установка стэйта и проверка пользователя на авторизацию
+													#через global $USER->isAuthorized() , если false то возвращает die()
+													if_not_user_auth: die
+													#Иначе
+													define: ['START_EXEC_PROLOG_AFTER_2',time]
+												}
+												include: '/freetrix/modules/main/interface/settings_admin_form.php'
+
+												#global $APPLICATION->RestartBuffer и другие методы
+												include: '/freetrix/modules/main/classes/general/main.php'
+
+												include: '/freetrix/modules/main/include/epilog_admin_js.php' : {
+													define: ['START_EXEC_EPILOG_BEFORE_1',time]
+													define: ['ADMIN_AJAX_MODE','true']
+													include: '/freetrix/modules/main/include/epilog_admin_after.php' : {
+														define: ['START_EXEC_EPILOG_AFTER_1',time]
+														#Регает стэйт в глобалс
+														#отслыка к CMain через $r = $APPLICATION->EndBufferContentMan()
+														#и делает echo $r
+														#Регается стэйт
+														define: ['START_EXEC_EVENTS_1',time]
+														#Отсылка к CMain CMain::EpilogActions();
+														define: ['START_EXEC_EVENTS_2',time]
+
+														#Завершение работы админки
+														die: [ '$DB->Disconnect();', 'CMain::ForkActions();']
+
+
+													}
+												}
+
+											} #end of admin_lib.php
+
+											define: ['ADMIN_THEME_ID',currentTheme]
+										} #end of init_admin.php
+
+										#Далее идет проверка на публичную часть 
+										#Если не определен FX_PUBLIC_MODE ил FX_PUBLIC_MODE != 1 то
+										#делается инклюды, по условию
+
+										#Если не показывается форма авторизации (то есть авторизированный юзер зашел с достатком прав)
+										if: 'FX_AUTH_FORM = null'
+											#Это шаблон header'а страницы админки который используется $APPLICATION->AddBufferContent,ShowHeadStrings
+											#и др. отслыки CMain - /freetrix/modules/main/classes/general/main.php
+											#Сообщение которое отвечает за показ ТРИАЛА или ошиибок в адинке находится тоже здесь
+											#из шаблона делаются запросы в базу COption::GetOption
+
+										    include: '/freetrix/modules/main/interface/prolog_main_admin.php' : {
+										    	#По условию может подключаться
+										    	include: '/freetrix/php_interface/admin_header.php'
+
+										    	#Обязательно
+										    	include: '/freetrix/modules/main/interface/top_panel.php' : {
+										    		#Зависит от $APPLICATION CMain
+										    	}
+										    	include: '/freetrix/modules/main/interface/favorite_menu.php'
+										    	include: '/freetrix/modules/main/interface/desktop_menu.php'
+
+										    	#
+										    }
+										else:
+										    include: '/freetrix/modules/main/interface/prolog_auth_admin.php' : {
+										    	#Шаблон авторизации, шабон шапки авторизации, зависит от языков
+										    	#и от CJSCore
+										    }
+
+										#Иначе (FX_PUBLIC_MODE == 1)
+										#делается такой инклюд
+										include: '/freetrix/modules/main/interface/prolog_jspopup_admin.php'
+
+										define: ['START_EXEC_PROLOG_AFTER_2',time]
+										#рега стэйта    
+
+									} # КОНЕЦ prolog_admin_after.php в main.php
+
+									#Видимо это подгружает весь контент как #WORK_AREA#
+									include: '#FILE_PATH#'
+
+									include: '/freetrix/modules/main/include/epilog_admin.php' : {
+										include: '/freetrix/modules/main/include/epilog_admin_before.php' : {
+											define: ['START_EXEC_EPILOG_BEFORE_1']
+											#Дублирует проверку в if: 'FX_AUTH_FORM = null'
+											include: '/freetrix/modules/main/interface/epilog_main_admin.php' : {
+												reference: [true,'2']
+											}
+											include: '/freetrix/modules/main/interface/epilog_auth_admin.php' : {
+												reference: [true,'2']
+											}
+											include: '/freetrix/modules/main/interface/epilog_jspopup_admin.php' : {
+												reference: [true,'2']
+											}
+										}
+
+										include: '/freetrix/modules/main/include/epilog_admin_after.php' : {
+											define: ['START_EXEC_EPILOG_AFTER_1',time]
+											#отсылки к маину CMain::EpilogActions();
+											die: ['$DB->Disconnect();','CMain::ForkActions();']
+										}
+
+									} #КОНЕЦ epilog_admin.php
+
+									#Для формы авторизации юзают components 
+									include: /freetrix/components/freetrix/system.auth/component.php'
+									#Wrapper auth
+									include: '/freetrix/modules/main/interface/auth/wrapper.php'
+
+									#Работа с файловой системой и структурой
+									include: '.section.php'
+									#GetPhysicalName
+									include: '#SECTION#/#FILE_PHP#'
+
+									#IncludeModule
+									include: '/freetrix/modules/#MODULE_ID#/include.php'
+
+									#Optimize css
+									include: 'info files maps'
+
+									#Там же лежит код отвечающий за COMPONENTS 2.0
+									#Там же есть SetFileAccessPermission отвечает за права на файлы
+									# .access.php этот метод юзает CACHE MANAGER CleanDir and CFreetrixComponent::clearComponentCache
+									#RemoveFileAccessPermission тоже юзает CACHE MANAGER
+									#Также отсылки к классу CTask, COption, CSite и др.
+
+								} #КОНЕЦ main.php
+							}	
+							
+							include: '/freetrix/modules/main/classes/#DATABASE_TYPE#/option.php'
+							include: '/freetrix/modules/main/classes/general/cache.php'
+							#Повтор
+							include: '/freetrix/modules/main/classes/general/cache_html.php' : {
+								reference: [true,'2'] # был инклюд в файле root/freetrix/modules/main/include/prolog.php
+							}
+							include: '/freetrix/modules/main/classes/general/module.php'
+						}
+					}
+				}
+			}
+		}
+	}
+} 
