@@ -102,7 +102,6 @@ require_once($_SERVER["DOCUMENT_ROOT"].FX_ROOT."/modules/main/classes/general/ur
 			"CEditArea" => "public/edit_area.php",
 			"CComponentPanel" => "public/edit_area.php",
 			"CTextParser" => "classes/general/textparser.php",
-			//"CPHPCacheFiles" => "classes/general/cache_files.php",
 			"CDataXML" => "classes/general/xml.php",
 			"CXMLFileStream" => "classes/general/xml.php",
 			"CRsaProvider" => "classes/general/rsasecurity.php",
